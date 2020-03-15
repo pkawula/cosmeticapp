@@ -1,0 +1,26 @@
+{
+  "extends": ["airbnb", "prettier", "prettier/react"],
+  "env": { "jest": true },
+  "globals": {
+    "window": true,
+    "document": true
+  },
+  "rules": {
+    "import/no-extraneous-dependencies": 0,
+    "import/prefer-default-export": 0,
+    "react/jsx-filename-extension": [1, { "extensions": [".js"] }],
+    "react/state-in-constructor": [0, "never"],
+    "react/jsx-props-no-spreading": 0,
+    "no-underscore-dangle": 0,
+    "no-console": 0
+  },
+  "parser": "babel-eslint",
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": ["./src"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  }
+}
