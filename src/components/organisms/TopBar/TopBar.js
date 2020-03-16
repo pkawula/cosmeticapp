@@ -1,7 +1,7 @@
 import React from 'react';
-import Logo from 'components/atoms/Logo';
+import Logo from 'components/atoms/Logo/Logo';
 import styled from 'styled-components';
-import ButtonIcon from 'components/atoms/ButtonIcon';
+import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import SettingsIcon from 'images/icons/settings_icon.svg';
 import LogoutIcon from 'images/icons/logout_icon.svg';
 
@@ -15,6 +15,7 @@ const StyledHeader = styled.header`
   align-items: center;
   padding-left: 0.5em;
   padding-right: 0.5em;
+  box-shadow: 0px 5px 15px -3px hsla(0, 0%, 0%, 0.2);
 `;
 
 const StyledNav = styled.nav`

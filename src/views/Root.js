@@ -1,21 +1,22 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { routes } from 'routes';
-import TopBar from 'components/organisms/TopBar';
+import TopBar from 'components/organisms/TopBar/TopBar';
 import { ThemeProvider } from 'styled-components';
 import { theme } from 'theme/mainTheme';
 import GlobalStyle from 'theme/GlobalStyle';
+import Panel from 'views/Panel';
 
 const Root = () => (
-  <ThemeProvider theme={theme}>
-    <GlobalStyle />
-    <BrowserRouter>
+  <BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <TopBar />
       <Switch>
-        <TopBar />
-        <Route exact path={routes.home} />
+        <Route exact path={routes.home} component={Panel} />
       </Switch>
-    </BrowserRouter>
-  </ThemeProvider>
+    </ThemeProvider>
+  </BrowserRouter>
 );
 
 export default Root;

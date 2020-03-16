@@ -17,6 +17,8 @@ const GlobalStyle = createGlobalStyle`
         font-size: 1.8rem;
         margin: 0;
         padding: 0;
+        background-color: ${({ theme }) => theme.light};
+        overflow-x: hidden;
     }
 
 `;
