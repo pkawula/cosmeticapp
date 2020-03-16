@@ -21,8 +21,12 @@ const StyledPageName = styled.p`
 const Panel = () => (
   <StyledContainer>
     <StyledPageName>Dashboard</StyledPageName>
-    <Card items={{ clients: ['all clients', 'add new'] }} />
-    <Card />
+    <Card
+      items={{
+        clients: ['all clients', 'add new'],
+      }}
+    />
+    <Card items={{ appointments: ['all appoitments', 'callendar', 'new appointment'] }} />
   </StyledContainer>
 );
 

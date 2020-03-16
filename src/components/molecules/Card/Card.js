@@ -18,7 +18,8 @@ const StyledHeading = styled.h1(
     color: ${theme.light};
     background-color: ${theme.secondary};
     display: block;
-    margin: 0.5rem auto;
+    margin: 0.5em auto;
+    padding: 0.3em 0;
     border-radius: 10px 10px 0 0;
     text-align: center;
     box-shadow: 0px 3px 10px -1px hsla(0, 0%, 0%, 0.2);
