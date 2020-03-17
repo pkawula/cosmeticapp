@@ -4,7 +4,7 @@ export const theme = {
   secondary: 'hsl(318, 60%, 60%)',
   light: 'hsl(0, 0%, 90%)',
   black: 'hsl(0, 0%, 20%)',
-  cancel: 'hsl(0, 83%, 55)',
+  cancel: 'hsl(0, 83%, 55%)',
   fontWeight: {
     light: 300,
     semibold: 400,

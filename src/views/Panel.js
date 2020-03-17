@@ -2,6 +2,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import Card from 'components/molecules/Card/Card';
 import Button from 'components/atoms/Button/Button';
+import { Link } from 'react-router-dom';
+import { routes } from 'routes';
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -19,12 +21,20 @@ const StyledPageName = styled.p`
   `}
 `;
 
+const StyledButton = styled(Button)`
+  text-decoration: none;
+`;
+
 const Panel = () => (
   <StyledContainer>
     <StyledPageName>Dashboard</StyledPageName>
     <Card cardTitle="Clients">
-      <Button secondary>All clients</Button>
-      <Button>Add client</Button>
+      <StyledButton as={Link} to={routes.clients} secondary>
+        All clients
+      </StyledButton>
+      <StyledButton as={Link} to={routes.addClient}>
+        Add client
+      </StyledButton>
     </Card>
     <Card cardTitle="Appointments">
       <Button secondary>Manage appointments</Button>

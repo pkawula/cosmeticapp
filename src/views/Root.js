@@ -6,6 +6,7 @@ import { ThemeProvider } from 'styled-components';
 import { theme } from 'theme/mainTheme';
 import GlobalStyle from 'theme/GlobalStyle';
 import Panel from 'views/Panel';
+import AddClient from './AddClient';
 
 const Root = () => (
   <BrowserRouter>
@@ -14,6 +15,7 @@ const Root = () => (
       <TopBar />
       <Switch>
         <Route exact path={routes.home} component={Panel} />
+        <Route path={routes.addClient} component={AddClient} />
       </Switch>
     </ThemeProvider>
   </BrowserRouter>
