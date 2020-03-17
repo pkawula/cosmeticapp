@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from 'components/atoms/Button/Button';
+import propTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 const StyledWrapper = styled.div`
@@ -16,7 +16,7 @@ const StyledHeading = styled.h1(
     font-size: ${theme.fontSize.m};
     font-weight: ${theme.fontWeight.bold};
     color: ${theme.light};
-    background-color: ${theme.secondary};
+    background-color: ${theme.bg};
     display: block;
     margin: 0.5em auto;
     padding: 0.3em 0;
@@ -35,14 +35,16 @@ const StyledInnerWrapper = styled.div`
   padding: 0.5em;
 `;
 
-const Card = () => (
+const Card = ({ children, cardTitle }) => (
   <StyledWrapper>
-    <StyledHeading>Clients</StyledHeading>
-    <StyledInnerWrapper>
-      <Button secondary>All clients</Button>
-      <Button>Add new</Button>
-    </StyledInnerWrapper>
+    <StyledHeading>{cardTitle}</StyledHeading>
+    <StyledInnerWrapper>{children}</StyledInnerWrapper>
   </StyledWrapper>
 );
+
+Card.propTypes = {
+  children: propTypes.oneOfType(propTypes.node, propTypes.element).isRequired,
+  cardTitle: propTypes.string.isRequired,
+};
 
 export default Card;

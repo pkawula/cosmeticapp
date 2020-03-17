@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import Card from 'components/molecules/Card/Card';
+import Button from 'components/atoms/Button/Button';
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -21,12 +22,15 @@ const StyledPageName = styled.p`
 const Panel = () => (
   <StyledContainer>
     <StyledPageName>Dashboard</StyledPageName>
-    <Card
-      items={{
-        clients: ['all clients', 'add new'],
-      }}
-    />
-    <Card items={{ appointments: ['all appoitments', 'callendar', 'new appointment'] }} />
+    <Card cardTitle="Clients">
+      <Button secondary>All clients</Button>
+      <Button>Add client</Button>
+    </Card>
+    <Card cardTitle="Appointments">
+      <Button secondary>Manage appointments</Button>
+      <Button secondary>Callendar</Button>
+      <Button>New appointment</Button>
+    </Card>
   </StyledContainer>
 );
 
