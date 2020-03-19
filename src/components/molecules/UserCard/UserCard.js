@@ -4,6 +4,8 @@ import PenIcon from 'images/icons/pen_icon.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import { routes } from 'routes';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -32,19 +34,25 @@ const StyledImage = styled.img`
   margin: 0 auto;
 `;
 
-const StyledInputField = styled(InputField)`
+const StyledLabel = styled.label`
   background: transparent;
-  width: 50px;
-  height: 50%;
-  background-image: ${PenIcon};
+  width: 40px;
+  height: 40px;
+  background-image: url(${PenIcon});
   background-repeat: no-repeat;
   background-size: 100%;
   background-position: center;
   border: none;
   border-radius: 0;
   position: absolute;
-  top: 50px;
-  right: 40%;
+  top: 0px;
+  right: 20%;
+  cursor: pointer;
+`;
+
+const StyledInputField = styled.input`
+  display: none;
+  visibility: hidden;
 `;
 
 const StyledForm = styled.form`
@@ -63,11 +71,17 @@ const StyledSubmittingContainer = styled.div`
   margin-top: 1em;
 `;
 
+const StyledLinkButton = styled(Button)`
+  text-decoration: none;
+`;
+
 const UserCard = () => (
   <StyledWrapper>
     <StyledImageSection>
       <StyledImage src={ProfilePicture} alt="Profile picture" />
-      <StyledInputField type="file" title="add/change image" name="image" />
+      <StyledLabel title="add/change image">
+        <StyledInputField type="file" name="addImage" />
+      </StyledLabel>
     </StyledImageSection>
     <StyledForm>
       <InputField type="text" placeholder="name" name="name" />
@@ -79,7 +93,9 @@ const UserCard = () => (
       />
       <InputField type="email" placeholder="email address" name="email" />
       <StyledSubmittingContainer>
-        <Button cancel>Cancel</Button>
+        <StyledLinkButton cancel as={Link} to={routes.clients}>
+          Cancel
+        </StyledLinkButton>
         <Button>Save</Button>
       </StyledSubmittingContainer>
     </StyledForm>
