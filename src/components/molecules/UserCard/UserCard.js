@@ -46,7 +46,7 @@ const StyledLabel = styled.label`
   border-radius: 0;
   position: absolute;
   top: 0px;
-  right: 20%;
+  right: 0;
   cursor: pointer;
 `;
 
