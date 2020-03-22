@@ -21,20 +21,16 @@ const StyledPageName = styled.p`
   `}
 `;
 
-const StyledButton = styled(Button)`
-  text-decoration: none;
-`;
-
 const Panel = () => (
   <StyledContainer>
     <StyledPageName>Dashboard</StyledPageName>
     <Card cardTitle="Clients">
-      <StyledButton as={Link} to={routes.clients} secondary>
+      <Button as={Link} to={routes.clients} secondary>
         All clients
-      </StyledButton>
-      <StyledButton as={Link} to={routes.addClient}>
+      </Button>
+      <Button as={Link} to={routes.addClient}>
         Add client
-      </StyledButton>
+      </Button>
     </Card>
     <Card cardTitle="Appointments">
       <Button secondary>Manage appointments</Button>

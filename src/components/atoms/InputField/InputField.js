@@ -14,19 +14,21 @@ const StyledInput = styled.input`
   background: transparent;
 `;
 
-const InputField = ({ type, name, placeholder }) => (
-  <StyledInput type={type} name={name} placeholder={placeholder} />
+const InputField = ({ type, name, placeholder, ...props }) => (
+  <StyledInput type={type} {...name} placeholder={placeholder} {...props} />
 );
 
 InputField.propTypes = {
   type: propTypes.string,
   name: propTypes.string.isRequired,
   placeholder: propTypes.string,
+  props: propTypes.oneOfType([propTypes.string, propTypes.func, propTypes.node, propTypes.bool]),
 };
 
 InputField.defaultProps = {
   type: 'text',
   placeholder: '',
+  props: null,
 };
 
 export default InputField;

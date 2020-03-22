@@ -1,7 +1,8 @@
+import React from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 
-const Button = styled.button(
+const StyledButton = styled.button(
   ({ theme }) => css`
     font-family: inherit;
     display: inline-block;
@@ -16,6 +17,7 @@ const Button = styled.button(
     box-shadow: 2px 2px 15px -4px hsla(0, 0%, 0%, 0.2);
     cursor: pointer;
     text-transform: uppercase;
+    text-decoration: none;
 
     &:active {
       animation: tap 0.3s ease-in-out 1;
@@ -48,14 +50,16 @@ const Button = styled.button(
   `,
 );
 
+const Button = ({ children, ...props }) => <StyledButton {...props}>{children}</StyledButton>;
+
 Button.propTypes = {
-  secondary: propTypes.bool,
-  cancel: propTypes.bool,
+  children: propTypes.string,
+  props: propTypes.oneOfType([propTypes.func, propTypes.bool, propTypes.string, propTypes.node]),
 };
 
 Button.defaultProps = {
-  secondary: false,
-  cancel: false,
+  children: '',
+  props: null,
 };
 
 export default Button;

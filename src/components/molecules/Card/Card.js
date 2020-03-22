@@ -43,7 +43,7 @@ const Card = ({ children, cardTitle }) => (
 );
 
 Card.propTypes = {
-  children: propTypes.oneOfType(propTypes.node, propTypes.element).isRequired,
+  children: propTypes.oneOfType([propTypes.node, propTypes.element]).isRequired,
   cardTitle: propTypes.string.isRequired,
 };
 
