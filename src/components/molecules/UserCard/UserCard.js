@@ -25,11 +25,14 @@ const StyledImageSection = styled.section`
 
 const StyledImage = styled.img`
   display: block;
-  width: 100%;
-  max-width: 150px;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  object-position: center;
   box-shadow: 2px 2px 15px -4px hsla(0, 0%, 0%, 0.2);
   background-color: transparent;
   border-radius: 50%;
+  margin-left: calc(150px * 0.25);
   padding: 0;
   margin: 0 auto;
 `;
@@ -76,6 +79,7 @@ class UserCard extends React.Component {
     name: '',
     phone: '',
     email: '',
+    image: '',
     allUsers: [],
   };
 
@@ -88,19 +92,27 @@ class UserCard extends React.Component {
     });
   };
 
+  getImageDetails = e => {
+    const file = e.target.files[0];
+    const reader = new window.FileReader();
+
+    reader.onload = () => {
+      this.setState({ image: reader.result });
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   saveUser = e => {
     e.preventDefault();
-    const { name, phone, email } = this.state;
+    const { name, phone, email, image } = this.state;
     const id = Math.random()
       .toString(36)
       .substr(2, 9);
 
-    if ((name !== '', phone !== '', email !== '')) {
+    if ((name !== '', phone !== '', email !== '', image)) {
       this.setState(prevState => ({
-        allUsers: [
-          ...prevState /* prevState is not iterable ?? {...prevState} -> in this case the whole array is duplicated and nested */,
-          { userID: id, name, phone, email },
-        ],
+        allUsers: [...prevState.allUsers, { userID: id, name, phone, email, image }],
       }));
     } else {
       console.log('fill in all fields!');
@@ -108,14 +120,14 @@ class UserCard extends React.Component {
   };
 
   render() {
-    const { name, phone, email } = this.state;
+    const { name, phone, email, image } = this.state;
 
     return (
       <StyledWrapper>
         <StyledImageSection>
-          <StyledImage src={ProfilePicture} alt="Profile picture" />
+          <StyledImage src={image || ProfilePicture} alt="Profile picture" />
           <StyledLabel title="add/change image">
-            <StyledInputField type="file" name="addImage" />
+            <StyledInputField type="file" onChange={e => this.getImageDetails(e)} name="addImage" />
           </StyledLabel>
         </StyledImageSection>
         <StyledForm>
