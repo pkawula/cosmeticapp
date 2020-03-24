@@ -6,6 +6,7 @@ import Button from 'components/atoms/Button/Button';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
+import { saveClient } from 'actions';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -80,7 +81,7 @@ class UserCard extends React.Component {
     phone: '',
     email: '',
     image: '',
-    allUsers: [],
+    allClients: [],
   };
 
   handleUserInput = e => {
@@ -112,8 +113,10 @@ class UserCard extends React.Component {
 
     if ((name !== '', phone !== '', email !== '', image)) {
       this.setState(prevState => ({
-        allUsers: [...prevState.allUsers, { userID: id, name, phone, email, image }],
+        allClients: [...prevState.allClients, { userID: id, name, phone, email, image }],
       }));
+
+      saveClient({ name, phone, email, image, userID: id });
     } else {
       console.log('fill in all fields!');
     }
