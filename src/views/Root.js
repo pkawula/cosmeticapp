@@ -7,7 +7,7 @@ import { theme } from 'theme/mainTheme';
 import GlobalStyle from 'theme/GlobalStyle';
 import Panel from 'views/Panel';
 import AddClient from './AddClient';
-import Clients from './Clients';
+import AllClients from './AllClients';
 
 const Root = () => (
   <BrowserRouter>
@@ -17,7 +17,7 @@ const Root = () => (
       <Switch>
         <Route exact path={routes.home} component={Panel} />
         <Route path={routes.addClient} component={AddClient} />
-        <Route path={routes.clients} component={Clients} />
+        <Route path={routes.clients} component={AllClients} />
       </Switch>
     </ThemeProvider>
   </BrowserRouter>
