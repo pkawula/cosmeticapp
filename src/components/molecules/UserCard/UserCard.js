@@ -6,7 +6,7 @@ import Button from 'components/atoms/Button/Button';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
-import { saveClient } from 'actions';
+import { Clients } from 'actions';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -116,7 +116,7 @@ class UserCard extends React.Component {
         allClients: [...prevState.allClients, { userID: id, name, phone, email, image }],
       }));
 
-      saveClient({ name, phone, email, image, userID: id });
+      Clients.save({ name, phone, email, image, userID: id });
     } else {
       console.log('fill in all fields!');
     }

@@ -1,7 +1,7 @@
-import { getClients } from 'actions';
+import { Clients as ClientsOptions } from 'actions';
 
 const Clients = () => {
-  getClients();
+  ClientsOptions.get();
   return null;
 };
 
