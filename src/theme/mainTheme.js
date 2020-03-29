@@ -2,7 +2,7 @@ export const theme = {
   bg: 'hsl(346, 100%, 72%)',
   primary: 'hsl(245, 21%, 49%)',
   secondary: 'hsl(318, 60%, 60%)',
-  light: 'hsl(0, 0%, 90%)',
+  light: 'hsl(0, 0%, 97%)',
   black: 'hsl(0, 0%, 20%)',
   cancel: 'hsl(0, 83%, 55%)',
   fontWeight: {
