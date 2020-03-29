@@ -1,5 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
+import propTypes from 'prop-types';
+
 import ProfilePicture from 'images/person.svg';
 import TrashIcon from 'images/icons/delete_icon.svg';
 import PenIcon from 'images/icons/pen_icon.svg';
@@ -132,14 +134,14 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-const ClientCard = () => (
+const ClientCard = ({ topCustomer }) => (
   <StyledWrapper>
     <StyledTopContainer>
       <StyledIconsContainer>
         <ButtonIcon src={TrashIcon} alt="Delete" />
         <ButtonIcon src={PenIcon} alt="Edit" />
       </StyledIconsContainer>
-      <StyledImageContainer topCustomer>
+      <StyledImageContainer topCustomer={topCustomer}>
         <StyledImage src={ProfilePicture} alt="Profile" />
       </StyledImageContainer>
       <StyledName>John Doe</StyledName>
@@ -161,6 +163,12 @@ const ClientCard = () => (
   </StyledWrapper>
 );
 
-ClientCard.propTypes = {};
+ClientCard.propTypes = {
+  topCustomer: propTypes.bool,
+};
+
+ClientCard.defaultProps = {
+  topCustomer: false,
+};
 
 export default ClientCard;

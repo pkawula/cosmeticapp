@@ -1,7 +1,8 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
-import Card from 'components/molecules/Card/Card';
+import styled from 'styled-components';
 import Button from 'components/atoms/Button/Button';
+import PageTitle from 'components/atoms/PageTitle/PageTitle';
+import Card from 'components/molecules/Card/Card';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
 
@@ -11,19 +12,9 @@ const StyledContainer = styled.div`
   padding: 0 0.5em;
 `;
 
-const StyledPageName = styled.p`
-  ${({ theme }) => css`
-    font-size: ${theme.fontSize.xs};
-    font-weight: ${theme.fontWeight.bold};
-    color: ${theme.black};
-    text-transform: uppercase;
-    margin: 0.5em 0;
-  `}
-`;
-
 const Panel = () => (
   <StyledContainer>
-    <StyledPageName>Dashboard</StyledPageName>
+    <PageTitle>Dashboard</PageTitle>
     <Card cardTitle="Clients">
       <Button as={Link} to={routes.clients} secondary>
         All clients
