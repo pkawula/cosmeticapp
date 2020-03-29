@@ -134,7 +134,7 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-const ClientCard = ({ topCustomer }) => (
+const ClientCard = ({ topCustomer, name, phone, email, image }) => (
   <StyledWrapper>
     <StyledTopContainer>
       <StyledIconsContainer>
@@ -142,15 +142,15 @@ const ClientCard = ({ topCustomer }) => (
         <ButtonIcon src={PenIcon} alt="Edit" />
       </StyledIconsContainer>
       <StyledImageContainer topCustomer={topCustomer}>
-        <StyledImage src={ProfilePicture} alt="Profile" />
+        <StyledImage src={image || ProfilePicture} alt="Profile" />
       </StyledImageContainer>
-      <StyledName>John Doe</StyledName>
+      <StyledName>{name}</StyledName>
     </StyledTopContainer>
     <StyledBottomContainer>
       <StyledList>
         <StyledListHeading>Contact info</StyledListHeading>
-        <StyledListItem src={PhoneIcon}>+48 123 456 789</StyledListItem>
-        <StyledListItem src={MailIcon}>e@mail.com</StyledListItem>
+        <StyledListItem src={PhoneIcon}>{phone}</StyledListItem>
+        <StyledListItem src={MailIcon}>{email}</StyledListItem>
       </StyledList>
       <StyledList>
         <StyledListHeading>Visit info</StyledListHeading>
@@ -165,6 +165,10 @@ const ClientCard = ({ topCustomer }) => (
 
 ClientCard.propTypes = {
   topCustomer: propTypes.bool,
+  name: propTypes.string.isRequired,
+  email: propTypes.string.isRequired,
+  phone: propTypes.string.isRequired,
+  image: propTypes.string.isRequired,
 };
 
 ClientCard.defaultProps = {
