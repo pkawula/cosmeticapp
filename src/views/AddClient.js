@@ -1,6 +1,5 @@
 import React from 'react';
 import ProfilePicture from 'images/person.svg';
-import PenIcon from 'images/icons/pen_icon.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 import styled from 'styled-components';
@@ -17,11 +16,31 @@ const StyledWrapper = styled.div`
   margin: 2em auto;
 `;
 
-const StyledImageSection = styled.section`
+const StyledLabel = styled.label`
   display: block;
   width: 100%;
   margin: 0 auto 1em;
   position: relative;
+
+  &::after {
+    content: '+';
+    position: absolute;
+    bottom: 0em;
+    left: calc(50% + 1.2em);
+    width: 1.2em;
+    height: 1.2em;
+    padding: 0.1em;
+    font-size: ${({ theme }) => theme.fontSize.l};
+    font-weight: ${({ theme }) => theme.fontWeight.bold};
+    text-align: center;
+    color: ${({ theme }) => theme.light};
+    background-color: ${({ theme }) => theme.primary};
+    border-radius: 50%;
+    margin: 0;
+    line-height: 1;
+    box-shadow: 2px 2px 15px -4px hsla(0, 0%, 0%, 0.2);
+    cursor: pointer;
+  }
 `;
 
 const StyledImage = styled.img`
@@ -36,21 +55,6 @@ const StyledImage = styled.img`
   margin-left: calc(150px * 0.25);
   padding: 0;
   margin: 0 auto;
-`;
-
-const StyledLabel = styled.label`
-  background: transparent;
-  width: 40px;
-  height: 40px;
-  background-image: url(${PenIcon});
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-position: center;
-  border: none;
-  border-radius: 0;
-  position: absolute;
-  top: 0px;
-  right: 0;
   cursor: pointer;
 `;
 
@@ -127,12 +131,10 @@ class AddClient extends React.Component {
 
     return (
       <StyledWrapper>
-        <StyledImageSection>
+        <StyledLabel title="add/change image">
           <StyledImage src={image || ProfilePicture} alt="Profile picture" />
-          <StyledLabel title="add/change image">
-            <StyledInputField type="file" onChange={e => this.getImageDetails(e)} name="addImage" />
-          </StyledLabel>
-        </StyledImageSection>
+          <StyledInputField type="file" onChange={e => this.getImageDetails(e)} name="addImage" />
+        </StyledLabel>
         <StyledForm>
           <InputField
             type="text"
