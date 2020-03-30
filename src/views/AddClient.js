@@ -52,7 +52,6 @@ const StyledImage = styled.img`
   box-shadow: 2px 2px 15px -4px hsla(0, 0%, 0%, 0.2);
   background-color: transparent;
   border-radius: 50%;
-  margin-left: calc(150px * 0.25);
   padding: 0;
   margin: 0 auto;
   cursor: pointer;
@@ -79,6 +78,29 @@ const StyledSubmittingContainer = styled.div`
   margin-top: 1em;
 `;
 
+const ErrorContainer = styled.div`
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  position: fixed;
+  flex-direction: column;
+  top: 2em;
+  right: 2em;
+`;
+
+const ErrorMessage = styled.span`
+  display: block;
+  margin: 0.5em 0;
+  padding: 1em;
+  font-size: ${({ theme }) => theme.fontSize.xs};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  color: ${({ theme }) => theme.light};
+  text-align: center;
+  background-color: ${({ type, theme }) =>
+    (type === 'success' && theme.success) || (type === 'error' && theme.cancel)};
+  border-radius: 0.5em;
+`;
+
 class AddClient extends React.Component {
   state = {
     name: '',
@@ -86,6 +108,10 @@ class AddClient extends React.Component {
     email: '',
     image: '',
     allClients: [],
+    error: {
+      type: '',
+      message: '',
+    },
   };
 
   handleUserInput = e => {
@@ -118,22 +144,54 @@ class AddClient extends React.Component {
     if ((name !== '', phone !== '', email !== '', image)) {
       this.setState(prevState => ({
         allClients: [...prevState.allClients, { userID: id, name, phone, email, image }],
+        error: { type: 'success', message: 'The client is added' },
       }));
 
       Clients.save({ name, phone, email, image, userID: id });
+
+      setTimeout(
+        () =>
+          this.setState({
+            name: '',
+            phone: '',
+            email: '',
+            image: '',
+            allClients: [],
+            error: {
+              type: '',
+              message: '',
+            },
+          }),
+        3000,
+      );
     } else {
-      console.log('fill in all fields!');
+      this.setState({ error: { type: 'error', message: 'Please fill in all fields' } });
+      setTimeout(
+        () =>
+          this.setState({
+            error: {
+              type: '',
+              message: '',
+            },
+          }),
+        5000,
+      );
     }
   };
 
   render() {
-    const { name, phone, email, image } = this.state;
+    const { name, phone, email, image, error } = this.state;
 
     return (
       <StyledWrapper>
         <StyledLabel title="add/change image">
           <StyledImage src={image || ProfilePicture} alt="Profile picture" />
-          <StyledInputField type="file" onChange={e => this.getImageDetails(e)} name="addImage" />
+          <StyledInputField
+            type="file"
+            accept="image/*"
+            onChange={e => this.getImageDetails(e)}
+            name="addImage"
+          />
         </StyledLabel>
         <StyledForm>
           <InputField
@@ -170,6 +228,9 @@ class AddClient extends React.Component {
             </Button>
           </StyledSubmittingContainer>
         </StyledForm>
+        <ErrorContainer>
+          {error && <ErrorMessage type={error.type}>{error.message}</ErrorMessage>}
+        </ErrorContainer>
       </StyledWrapper>
     );
   }

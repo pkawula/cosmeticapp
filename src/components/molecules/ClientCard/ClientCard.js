@@ -70,7 +70,7 @@ const StyledImage = styled.img`
   display: block;
   width: 150px;
   height: 150px;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   border-radius: 50%;
   margin: -1em auto 1em;

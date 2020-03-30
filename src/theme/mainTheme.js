@@ -5,6 +5,7 @@ export const theme = {
   light: 'hsl(0, 0%, 97%)',
   black: 'hsl(0, 0%, 20%)',
   cancel: 'hsl(0, 83%, 55%)',
+  success: 'hsl(140, 84%, 45%)',
   fontWeight: {
     light: 300,
     semibold: 400,
