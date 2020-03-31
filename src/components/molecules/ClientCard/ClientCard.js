@@ -10,6 +10,8 @@ import MailIcon from 'images/icons/mail_icon.svg';
 import LipstickIcon from 'images/icons/lipstick_icon.svg';
 import VisitIcon from 'images/icons/visit_icon.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
+import Link from 'components/atoms/Link/Link';
+import { Clients } from 'actions';
 
 const StyledWrapper = styled.main`
   display: block;
@@ -134,11 +136,19 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-const ClientCard = ({ topCustomer, name, phone, email, image }) => (
+const deleteClient = id => {
+  const allClients = JSON.parse(Clients.get());
+
+  const clients = allClients.filter(({ userID }) => userID !== id);
+
+  window.localStorage.setItem('clients', JSON.stringify(clients));
+};
+
+const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => (
   <StyledWrapper>
     <StyledTopContainer>
       <StyledIconsContainer>
-        <ButtonIcon src={TrashIcon} alt="Delete" />
+        <ButtonIcon onClick={() => deleteClient(userID)} src={TrashIcon} alt="Delete" />
         <ButtonIcon src={PenIcon} alt="Edit" />
       </StyledIconsContainer>
       <StyledImageContainer topCustomer={topCustomer}>
@@ -149,8 +159,12 @@ const ClientCard = ({ topCustomer, name, phone, email, image }) => (
     <StyledBottomContainer>
       <StyledList>
         <StyledListHeading>Contact info</StyledListHeading>
-        <StyledListItem src={PhoneIcon}>{phone}</StyledListItem>
-        <StyledListItem src={MailIcon}>{email}</StyledListItem>
+        <StyledListItem src={PhoneIcon}>
+          <Link href={`tel:${phone}`}>{phone}</Link>
+        </StyledListItem>
+        <StyledListItem src={MailIcon}>
+          <Link href={`mailto:${email}`}>{email}</Link>
+        </StyledListItem>
       </StyledList>
       <StyledList>
         <StyledListHeading>Visit info</StyledListHeading>
@@ -169,6 +183,7 @@ ClientCard.propTypes = {
   email: propTypes.string.isRequired,
   phone: propTypes.string.isRequired,
   image: propTypes.string.isRequired,
+  userID: propTypes.string.isRequired,
 };
 
 ClientCard.defaultProps = {
