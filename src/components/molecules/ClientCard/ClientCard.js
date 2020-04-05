@@ -141,7 +141,11 @@ const deleteClient = id => {
 
   const clients = allClients.filter(({ userID }) => userID !== id);
 
-  window.localStorage.setItem('clients', JSON.stringify(clients));
+  if (!clients.length) {
+    Clients.delete();
+  } else {
+    Clients.update(clients);
+  }
 };
 
 const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => (

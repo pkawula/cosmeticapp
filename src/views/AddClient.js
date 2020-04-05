@@ -162,7 +162,7 @@ class AddClient extends React.Component {
               message: '',
             },
           }),
-        3000,
+        1000,
       );
     } else {
       this.setState({ error: { type: 'error', message: 'Please fill in all fields' } });
