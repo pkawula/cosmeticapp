@@ -12,6 +12,7 @@ import VisitIcon from 'images/icons/visit_icon.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Link from 'components/atoms/Link/Link';
 import { Clients } from 'actions';
+import EditClient from 'components/organisms/EditClient/EditClient';
 
 const StyledWrapper = styled.main`
   display: block;
@@ -178,6 +179,7 @@ const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => (
         <StyledListItem src={VisitIcon}>tuesday, 27th june, 7 a.m.</StyledListItem>
       </StyledList>
     </StyledBottomContainer>
+    <EditClient name={name} phone={phone} email={email} picture={image} />
   </StyledWrapper>
 );
 
