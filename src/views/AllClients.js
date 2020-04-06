@@ -18,9 +18,9 @@ const StyledCardContainer = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin: 2em auto;
+  margin: auto;
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 567px) {
     align-items: center;
   }
 `;
@@ -34,6 +34,7 @@ const StyledInfo = styled.p`
   text-transform: uppercase;
   margin: 1em 0;
   display: block;
+  width: 100%;
 `;
 
 class AllClients extends React.Component {

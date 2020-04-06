@@ -21,7 +21,7 @@ const StyledWrapper = styled.main`
   border-radius: 10px;
   background-color: ${({ theme }) => theme.light};
   box-shadow: 2px 2px 15px -4px hsla(0, 0%, 0%, 0.2);
-  margin: 1em;
+  margin: 2em auto;
 `;
 
 const StyledTopContainer = styled.section`

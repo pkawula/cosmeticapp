@@ -15,6 +15,6 @@ export const Clients = {
   delete: () => window.localStorage.removeItem('clients'),
   update: item => {
     Clients.delete();
-    Clients.save(...item);
+    Clients.save(item);
   },
 };
