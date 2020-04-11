@@ -8,13 +8,13 @@ import { Clients } from 'actions';
 
 const StyledWrapper = styled.div`
   width: 100%;
-  max-width: 450px;
+  max-width: 90%;
   height: auto;
   min-height: 90vh;
   margin: auto;
   padding: 1em;
   border-radius: 1em;
-  box-shadow: 0px 0px 200px -100px hsla(0, 0%, 0%, 0.4);
+  box-shadow: 0px 0px 200px -30px hsla(0, 0%, 0%, 0.7);
   background: ${({ theme }) => theme.light};
   position: fixed;
   top: 1em;
