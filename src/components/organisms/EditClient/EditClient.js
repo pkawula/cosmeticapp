@@ -33,8 +33,8 @@ const StyledWrapper = styled.div`
 `;
 
 const StyledLabel = styled.label`
-  display: block;
-  width: 100%;
+  display: inline-block;
+  width: auto;
   margin: 0 auto 1em;
   position: relative;
 
@@ -78,8 +78,45 @@ const StyledInputField = styled.input`
   visibility: hidden;
 `;
 
-const EditClient = ({ name, email, phone, picture }) => (
+const StyledCloseButton = styled.button`
+  width: 3em;
+  height: 3em;
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  padding: 2em;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 99;
+
+  &::before,
+  &::after {
+    content: '';
+    width: 100%;
+    height: 5px;
+    background-color: ${({ theme }) => theme.black};
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center;
+  }
+
+  &::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  &::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+`;
+
+const EditClient = ({ name, email, phone, picture, toggleModal }) => (
   <StyledWrapper>
+    <StyledCloseButton onClick={toggleModal} />
     <StyledLabel title="add/change image">
       <StyledImage src={picture || ProfilePicture} alt="Profile picture" />
       <StyledInputField type="file" accept="image/*" name="addImage" />
@@ -87,7 +124,9 @@ const EditClient = ({ name, email, phone, picture }) => (
     <InputField value={name} placeholder="name" id="name" />
     <InputField value={phone} placeholder="phone" id="phone" />
     <InputField value={email} placeholder="email" id="email" />
-    <Button cancel>Cancel</Button>
+    <Button cancel onClick={toggleModal}>
+      Cancel
+    </Button>
     <Button>Save</Button>
   </StyledWrapper>
 );
@@ -97,6 +136,7 @@ EditClient.propTypes = {
   phone: propTypes.string.isRequired,
   email: propTypes.string.isRequired,
   picture: propTypes.string.isRequired,
+  toggleModal: propTypes.func.isRequired,
 };
 
 export default EditClient;

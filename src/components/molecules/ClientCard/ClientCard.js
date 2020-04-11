@@ -137,51 +137,72 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-const deleteClient = id => {
-  const allClients = JSON.parse(Clients.get());
+class ClientCard extends React.Component {
+  state = { modalOpened: false };
 
-  const clients = allClients.filter(({ userID }) => userID !== id);
+  deleteClient = id => {
+    const allClients = JSON.parse(Clients.get());
 
-  if (!clients.length) {
-    Clients.delete();
-  } else {
-    Clients.update(clients);
+    const clients = allClients.filter(({ userID }) => userID !== id);
+
+    if (!clients.length) {
+      Clients.delete();
+    } else {
+      Clients.update(clients);
+    }
+  };
+
+  toggleModal = () => {
+    const { modalOpened } = this.state;
+    this.setState({ modalOpened: !modalOpened });
+  };
+
+  render() {
+    const { topCustomer, name, phone, email, image, userID } = this.props;
+    const { modalOpened } = this.state;
+    return (
+      <StyledWrapper>
+        <StyledTopContainer>
+          <StyledIconsContainer>
+            <ButtonIcon onClick={() => this.deleteClient(userID)} src={TrashIcon} alt="Delete" />
+            <ButtonIcon onClick={() => this.toggleModal()} src={PenIcon} alt="Edit" />
+          </StyledIconsContainer>
+          <StyledImageContainer topCustomer={topCustomer}>
+            <StyledImage src={image || ProfilePicture} alt="Profile" />
+          </StyledImageContainer>
+          <StyledName>{name}</StyledName>
+        </StyledTopContainer>
+        <StyledBottomContainer>
+          <StyledList>
+            <StyledListHeading>Contact info</StyledListHeading>
+            <StyledListItem src={PhoneIcon}>
+              <Link href={`tel:${phone}`}>{phone}</Link>
+            </StyledListItem>
+            <StyledListItem src={MailIcon}>
+              <Link href={`mailto:${email}`}>{email}</Link>
+            </StyledListItem>
+          </StyledList>
+          <StyledList>
+            <StyledListHeading>Visit info</StyledListHeading>
+            <StyledListItem src={LipstickIcon} bold>
+              23
+            </StyledListItem>
+            <StyledListItem src={VisitIcon}>tuesday, 27th june, 7 a.m.</StyledListItem>
+          </StyledList>
+        </StyledBottomContainer>
+        {modalOpened && (
+          <EditClient
+            toggleModal={this.toggleModal}
+            name={name}
+            email={email}
+            phone={phone}
+            picture={image}
+          />
+        )}
+      </StyledWrapper>
+    );
   }
-};
-
-const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => (
-  <StyledWrapper>
-    <StyledTopContainer>
-      <StyledIconsContainer>
-        <ButtonIcon onClick={() => deleteClient(userID)} src={TrashIcon} alt="Delete" />
-        <ButtonIcon src={PenIcon} alt="Edit" />
-      </StyledIconsContainer>
-      <StyledImageContainer topCustomer={topCustomer}>
-        <StyledImage src={image || ProfilePicture} alt="Profile" />
-      </StyledImageContainer>
-      <StyledName>{name}</StyledName>
-    </StyledTopContainer>
-    <StyledBottomContainer>
-      <StyledList>
-        <StyledListHeading>Contact info</StyledListHeading>
-        <StyledListItem src={PhoneIcon}>
-          <Link href={`tel:${phone}`}>{phone}</Link>
-        </StyledListItem>
-        <StyledListItem src={MailIcon}>
-          <Link href={`mailto:${email}`}>{email}</Link>
-        </StyledListItem>
-      </StyledList>
-      <StyledList>
-        <StyledListHeading>Visit info</StyledListHeading>
-        <StyledListItem src={LipstickIcon} bold>
-          23
-        </StyledListItem>
-        <StyledListItem src={VisitIcon}>tuesday, 27th june, 7 a.m.</StyledListItem>
-      </StyledList>
-    </StyledBottomContainer>
-    <EditClient name={name} phone={phone} email={email} picture={image} />
-  </StyledWrapper>
-);
+}
 
 ClientCard.propTypes = {
   topCustomer: propTypes.bool,
