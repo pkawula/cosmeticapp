@@ -196,7 +196,8 @@ class ClientCard extends React.Component {
             name={name}
             email={email}
             phone={phone}
-            picture={image}
+            image={image}
+            userID={userID}
           />
         )}
       </StyledWrapper>
