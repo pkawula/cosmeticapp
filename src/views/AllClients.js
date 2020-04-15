@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import ClientCard from 'components/molecules/ClientCard/ClientCard';
 import styled from 'styled-components';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
-import { Clients } from 'actions';
 import { routes } from 'routes';
 import { Link } from 'react-router-dom';
 import Button from 'components/atoms/Button/Button';
+import { ClientsContext } from 'contexts/Clients';
 
 const StyledWrapper = styled.div`
   display: block;
@@ -37,44 +37,35 @@ const StyledInfo = styled.p`
   width: 100%;
 `;
 
-class AllClients extends React.Component {
-  state = { clients: null };
+const AllClients = () => {
+  const { clients } = useContext(ClientsContext);
 
-  componentDidMount() {
-    const savedClients = JSON.parse(Clients.get());
+  return (
+    <StyledWrapper>
+      <PageTitle>All clients</PageTitle>
+      <StyledCardContainer>
+        {clients || clients === [null] ? (
+          clients.map(({ name, phone, email, image, userID }) => (
+            <ClientCard
+              key={userID}
+              name={name}
+              phone={phone}
+              email={email}
+              image={image}
+              userID={userID}
+            />
+          ))
+        ) : (
+          <>
+            <StyledInfo>No clients yet</StyledInfo>
+            <Button as={Link} to={routes.addClient}>
+              Add first client
+            </Button>
+          </>
+        )}
+      </StyledCardContainer>
+    </StyledWrapper>
+  );
+};
 
-    this.setState({ clients: savedClients });
-  }
-
-  render() {
-    const { clients } = this.state;
-
-    return (
-      <StyledWrapper>
-        <PageTitle>All clients</PageTitle>
-        <StyledCardContainer>
-          {clients || clients === [null] ? (
-            clients.map(({ name, phone, email, image, userID }) => (
-              <ClientCard
-                key={userID}
-                name={name}
-                phone={phone}
-                email={email}
-                image={image}
-                userID={userID}
-              />
-            ))
-          ) : (
-            <>
-              <StyledInfo>No clients yet</StyledInfo>
-              <Button as={Link} to={routes.addClient}>
-                Add first client
-              </Button>
-            </>
-          )}
-        </StyledCardContainer>
-      </StyledWrapper>
-    );
-  }
-}
 export default AllClients;

@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import ProfilePicture from 'images/person.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
-import { Clients } from 'actions';
+import { ClientsContext } from 'contexts/Clients';
+import { ADD_CLIENT } from 'reducers/Clients';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -101,139 +102,94 @@ const ErrorMessage = styled.span`
   border-radius: 0.5em;
 `;
 
-class AddClient extends React.Component {
-  state = {
-    name: '',
-    phone: '',
-    email: '',
-    image: '',
-    allClients: [],
-    error: {
-      type: '',
-      message: '',
-    },
-  };
+const AddClient = () => {
+  const { dispatch } = useContext(ClientsContext);
+  const [client, setClient] = useState('');
+  const [error, setError] = useState('');
 
-  handleUserInput = e => {
+  const handleUserInput = e => {
     const fieldType = e.target.id;
     const fieldValue = e.target.value;
 
-    this.setState({
-      [fieldType]: fieldValue,
-    });
+    setClient({ ...client, [fieldType]: fieldValue });
   };
 
-  getImageDetails = e => {
+  const getImageDetails = e => {
     const file = e.target.files[0];
     const reader = new window.FileReader();
 
     reader.onload = () => {
-      this.setState({ image: reader.result });
+      setClient({ ...client, image: reader.result });
     };
 
     reader.readAsDataURL(file);
   };
 
-  saveUser = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    const { name, phone, email, image } = this.state;
-    const id = Math.random()
-      .toString(36)
-      .substr(2, 9);
 
-    if ((name !== '', phone !== '', email !== '', image)) {
-      this.setState(prevState => ({
-        allClients: [...prevState.allClients, { userID: id, name, phone, email, image }],
-        error: { type: 'success', message: 'The client is added' },
-      }));
-
-      Clients.save({ name, phone, email, image, userID: id });
-
-      setTimeout(
-        () =>
-          this.setState({
-            name: '',
-            phone: '',
-            email: '',
-            image: '',
-            allClients: [],
-            error: {
-              type: '',
-              message: '',
-            },
-          }),
-        1000,
-      );
+    if (client.name && client.phone && client.email) {
+      dispatch({ type: ADD_CLIENT, payload: { ...client } });
+      setClient({});
+      setError({ type: 'success', message: 'Client added successfully' });
+      setTimeout(() => setError(''), 1000);
     } else {
-      this.setState({ error: { type: 'error', message: 'Please fill in all fields' } });
-      setTimeout(
-        () =>
-          this.setState({
-            error: {
-              type: '',
-              message: '',
-            },
-          }),
-        5000,
-      );
+      setError({ type: 'error', message: 'Fill in all fields!' });
+      setTimeout(() => setError(''), 3000);
     }
   };
 
-  render() {
-    const { name, phone, email, image, error } = this.state;
-
-    return (
-      <StyledWrapper>
-        <StyledLabel title="add/change image">
-          <StyledImage src={image || ProfilePicture} alt="Profile picture" />
-          <StyledInputField
-            type="file"
-            accept="image/*"
-            onChange={e => this.getImageDetails(e)}
-            name="addImage"
-          />
-        </StyledLabel>
-        <StyledForm>
-          <InputField
-            type="text"
-            placeholder="name"
-            name="name"
-            id="name"
-            value={name}
-            onChange={this.handleUserInput}
-          />
-          <InputField
-            type="tel"
-            pattern="(?<!\w)(\(?(\+|00)?48\)?)?[ -]?\d{3}[ -]?\d{3}[ -]?\d{3}(?!\w)"
-            name="phoneNumber"
-            id="phone"
-            placeholder="phone number"
-            onChange={this.handleUserInput}
-            value={phone}
-          />
-          <InputField
-            type="email"
-            placeholder="email address"
-            name="email"
-            id="email"
-            onChange={this.handleUserInput}
-            value={email}
-          />
-          <StyledSubmittingContainer>
-            <Button as={Link} cancel="true" to={routes.clients}>
-              Cancel
-            </Button>
-            <Button type="submit" onClick={e => this.saveUser(e)}>
-              Save
-            </Button>
-          </StyledSubmittingContainer>
-        </StyledForm>
-        <ErrorContainer>
-          {error && <ErrorMessage type={error.type}>{error.message}</ErrorMessage>}
-        </ErrorContainer>
-      </StyledWrapper>
-    );
-  }
-}
+  return (
+    <StyledWrapper>
+      <StyledLabel title="add/change image">
+        <StyledImage src={client.image || ProfilePicture} alt="Profile picture" />
+        <StyledInputField
+          type="file"
+          accept="image/*"
+          onChange={e => getImageDetails(e)}
+          name="addImage"
+        />
+      </StyledLabel>
+      <StyledForm>
+        <InputField
+          type="text"
+          placeholder="name"
+          name="name"
+          id="name"
+          value={client.name ? client.name : ''}
+          onChange={handleUserInput}
+        />
+        <InputField
+          type="tel"
+          pattern="(?<!\w)(\(?(\+|00)?48\)?)?[ -]?\d{3}[ -]?\d{3}[ -]?\d{3}(?!\w)"
+          name="phoneNumber"
+          id="phone"
+          placeholder="phone number"
+          onChange={handleUserInput}
+          value={client.phone ? client.phone : ''}
+        />
+        <InputField
+          type="email"
+          placeholder="email address"
+          name="email"
+          id="email"
+          onChange={handleUserInput}
+          value={client.email ? client.email : ''}
+        />
+        <StyledSubmittingContainer>
+          <Button as={Link} cancel="true" to={routes.clients}>
+            Cancel
+          </Button>
+          <Button type="submit" onClick={e => handleSubmit(e)}>
+            Save
+          </Button>
+        </StyledSubmittingContainer>
+      </StyledForm>
+      <ErrorContainer>
+        {error && <ErrorMessage type={error.type}>{error.message}</ErrorMessage>}
+      </ErrorContainer>
+    </StyledWrapper>
+  );
+};
 
 export default AddClient;

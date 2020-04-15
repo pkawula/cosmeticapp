@@ -6,6 +6,7 @@ import { ThemeProvider } from 'styled-components';
 import { theme } from 'theme/mainTheme';
 import GlobalStyle from 'theme/GlobalStyle';
 import Panel from 'views/Panel';
+import ClientsContextProvider from 'contexts/Clients';
 import AddClient from './AddClient';
 import AllClients from './AllClients';
 
@@ -14,11 +15,14 @@ const Root = () => (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <TopBar />
-      <Switch>
-        <Route exact path={routes.home} component={Panel} />
-        <Route path={routes.addClient} component={AddClient} />
-        <Route path={routes.clients} component={AllClients} />
-      </Switch>
+
+      <ClientsContextProvider>
+        <Switch>
+          <Route exact path={routes.home} component={Panel} />
+          <Route path={routes.addClient} component={AddClient} />
+          <Route path={routes.clients} component={AllClients} />
+        </Switch>
+      </ClientsContextProvider>
     </ThemeProvider>
   </BrowserRouter>
 );

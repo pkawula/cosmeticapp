@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
-
+import { ClientsContext } from 'contexts/Clients';
+import { REMOVE_CLIENT } from 'reducers/Clients';
 import ProfilePicture from 'images/person.svg';
 import TrashIcon from 'images/icons/delete_icon.svg';
 import PenIcon from 'images/icons/pen_icon.svg';
@@ -11,7 +12,6 @@ import LipstickIcon from 'images/icons/lipstick_icon.svg';
 import VisitIcon from 'images/icons/visit_icon.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Link from 'components/atoms/Link/Link';
-import { Clients } from 'actions';
 import EditClient from 'components/organisms/EditClient/EditClient';
 
 const StyledWrapper = styled.main`
@@ -137,73 +137,62 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-class ClientCard extends React.Component {
-  state = { modalOpened: false };
+const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => {
+  const { dispatch } = useContext(ClientsContext);
 
-  deleteClient = id => {
-    const allClients = JSON.parse(Clients.get());
+  const [modalOpened, setModal] = useState(false);
 
-    const clients = allClients.filter(({ userID }) => userID !== id);
-
-    if (!clients.length) {
-      Clients.delete();
-    } else {
-      Clients.update(clients);
-    }
+  const deleteClient = id => {
+    dispatch({ type: REMOVE_CLIENT, id });
   };
 
-  toggleModal = () => {
-    const { modalOpened } = this.state;
-    this.setState({ modalOpened: !modalOpened });
+  const toggleModal = () => {
+    setModal({ modalOpened: !modalOpened });
   };
 
-  render() {
-    const { topCustomer, name, phone, email, image, userID } = this.props;
-    const { modalOpened } = this.state;
-    return (
-      <StyledWrapper>
-        <StyledTopContainer>
-          <StyledIconsContainer>
-            <ButtonIcon onClick={() => this.deleteClient(userID)} src={TrashIcon} alt="Delete" />
-            <ButtonIcon onClick={() => this.toggleModal()} src={PenIcon} alt="Edit" />
-          </StyledIconsContainer>
-          <StyledImageContainer topCustomer={topCustomer}>
-            <StyledImage src={image || ProfilePicture} alt="Profile" />
-          </StyledImageContainer>
-          <StyledName>{name}</StyledName>
-        </StyledTopContainer>
-        <StyledBottomContainer>
-          <StyledList>
-            <StyledListHeading>Contact info</StyledListHeading>
-            <StyledListItem src={PhoneIcon}>
-              <Link href={`tel:${phone}`}>{phone}</Link>
-            </StyledListItem>
-            <StyledListItem src={MailIcon}>
-              <Link href={`mailto:${email}`}>{email}</Link>
-            </StyledListItem>
-          </StyledList>
-          <StyledList>
-            <StyledListHeading>Visit info</StyledListHeading>
-            <StyledListItem src={LipstickIcon} bold>
-              23
-            </StyledListItem>
-            <StyledListItem src={VisitIcon}>tuesday, 27th june, 7 a.m.</StyledListItem>
-          </StyledList>
-        </StyledBottomContainer>
-        {modalOpened && (
-          <EditClient
-            toggleModal={this.toggleModal}
-            name={name}
-            email={email}
-            phone={phone}
-            image={image}
-            userID={userID}
-          />
-        )}
-      </StyledWrapper>
-    );
-  }
-}
+  return (
+    <StyledWrapper>
+      <StyledTopContainer>
+        <StyledIconsContainer>
+          <ButtonIcon onClick={() => deleteClient(userID)} src={TrashIcon} alt="Delete" />
+          <ButtonIcon onClick={() => toggleModal()} src={PenIcon} alt="Edit" />
+        </StyledIconsContainer>
+        <StyledImageContainer topCustomer={topCustomer}>
+          <StyledImage src={image || ProfilePicture} alt="Profile" />
+        </StyledImageContainer>
+        <StyledName>{name}</StyledName>
+      </StyledTopContainer>
+      <StyledBottomContainer>
+        <StyledList>
+          <StyledListHeading>Contact info</StyledListHeading>
+          <StyledListItem src={PhoneIcon}>
+            <Link href={`tel:${phone}`}>{phone}</Link>
+          </StyledListItem>
+          <StyledListItem src={MailIcon}>
+            <Link href={`mailto:${email}`}>{email}</Link>
+          </StyledListItem>
+        </StyledList>
+        <StyledList>
+          <StyledListHeading>Visit info</StyledListHeading>
+          <StyledListItem src={LipstickIcon} bold>
+            23
+          </StyledListItem>
+          <StyledListItem src={VisitIcon}>tuesday, 27th june, 7 a.m.</StyledListItem>
+        </StyledList>
+      </StyledBottomContainer>
+      {modalOpened && (
+        <EditClient
+          toggleModalFunc={() => toggleModal()}
+          name={name}
+          email={email}
+          phone={phone}
+          image={image}
+          userID={userID}
+        />
+      )}
+    </StyledWrapper>
+  );
+};
 
 ClientCard.propTypes = {
   topCustomer: propTypes.bool,

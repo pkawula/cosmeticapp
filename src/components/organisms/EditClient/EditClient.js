@@ -163,12 +163,12 @@ class EditClient extends React.Component {
   };
 
   render() {
-    const { toggleModal, userID } = this.props;
+    const { toggleModalFunc, userID } = this.props;
     const { name, email, phone, image } = this.state;
 
     return (
       <StyledWrapper>
-        <StyledCloseButton onClick={toggleModal} />
+        <StyledCloseButton onClick={toggleModalFunc} />
         <StyledLabelContainer>
           <StyledLabel title="add/change image">
             <StyledImage src={image || ProfilePicture} alt="Profile picture" />
@@ -183,13 +183,13 @@ class EditClient extends React.Component {
         <InputField onChange={this.onUserInput} value={name} placeholder="name" id="name" />
         <InputField onChange={this.onUserInput} value={phone} placeholder="phone" id="phone" />
         <InputField onChange={this.onUserInput} value={email} placeholder="email" id="email" />
-        <Button cancel onClick={toggleModal}>
+        <Button cancel onClick={toggleModalFunc}>
           Cancel
         </Button>
         <Button
           onClick={() => {
             this.saveUpdated(userID);
-            toggleModal();
+            toggleModalFunc();
           }}
         >
           Save
@@ -205,7 +205,7 @@ EditClient.propTypes = {
   email: propTypes.string.isRequired,
   image: propTypes.string.isRequired,
   userID: propTypes.string.isRequired,
-  toggleModal: propTypes.func.isRequired,
+  toggleModalFunc: propTypes.func.isRequired,
 };
 
 export default EditClient;
