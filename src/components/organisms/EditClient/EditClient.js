@@ -11,7 +11,7 @@ const StyledWrapper = styled.div`
   width: 100%;
   max-width: 90%;
   height: auto;
-  min-height: 90vh;
+  max-height: 90vh;
   margin: auto;
   padding: 1em;
   border-radius: 1em;
@@ -23,6 +23,7 @@ const StyledWrapper = styled.div`
   right: 1em;
   z-index: 999;
   animation: fadeIn 0.3s ease-in-out 1;
+  overflow-y: scroll;
 
   @keyframes fadeIn {
     from {
@@ -80,6 +81,14 @@ const StyledImage = styled.img`
   padding: 0;
   margin: 0 auto;
   cursor: pointer;
+`;
+
+const StyledInputContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const StyledInputField = styled.input`
@@ -151,13 +160,21 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
   const { dispatch } = useContext(ClientsContext);
   const [client, setClient] = useState({ name, email, phone, image, clientID });
   const [error, setError] = useState('');
+  const [buttonActive, setButton] = useState(true);
 
   const onImageChange = e => {
     const file = e.target.files[0];
     const reader = new window.FileReader();
 
-    reader.onload = () => {
-      setClient({ ...client, image: reader.result });
+    reader.onloadstart = () => {
+      setButton(false);
+    };
+
+    reader.onloadend = () => {
+      if (reader.readyState === 2) {
+        setClient({ ...client, image: reader.result });
+        setButton(true);
+      }
     };
 
     reader.readAsDataURL(file);
@@ -198,19 +215,26 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
           />
         </StyledLabel>
       </StyledLabelContainer>
-      <InputField onChange={e => onUserInput(e)} value={client.name} placeholder="name" id="name" />
-      <InputField
-        onChange={e => onUserInput(e)}
-        value={client.phone}
-        placeholder="phone"
-        id="phone"
-      />
-      <InputField
-        onChange={e => onUserInput(e)}
-        value={client.email}
-        placeholder="email"
-        id="email"
-      />
+      <StyledInputContainer>
+        <InputField
+          onChange={e => onUserInput(e)}
+          value={client.name}
+          placeholder="name"
+          id="name"
+        />
+        <InputField
+          onChange={e => onUserInput(e)}
+          value={client.phone}
+          placeholder="phone"
+          id="phone"
+        />
+        <InputField
+          onChange={e => onUserInput(e)}
+          value={client.email}
+          placeholder="email"
+          id="email"
+        />
+      </StyledInputContainer>
       <Button cancel onClick={() => toggleModalFunc()}>
         Cancel
       </Button>
@@ -220,6 +244,7 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
           onSave(e);
           toggleModalFunc();
         }}
+        disabled={!buttonActive}
       >
         Save
       </Button>

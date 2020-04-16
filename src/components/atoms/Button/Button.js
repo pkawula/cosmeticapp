@@ -47,6 +47,12 @@ const StyledButton = styled.button(
         background-color: ${theme.cancel};
         border-color: transparent;
       `};
+
+    &:disabled {
+      opacity: 0.6;
+      transition: opacity 0.3s ease-in-out;
+      cursor: not-allowed;
+    }
   `,
 );
 

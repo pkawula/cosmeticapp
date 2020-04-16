@@ -106,6 +106,7 @@ const AddClient = () => {
   const { dispatch } = useContext(ClientsContext);
   const [client, setClient] = useState('');
   const [error, setError] = useState('');
+  const [buttonActive, setButton] = useState(true);
 
   const handleUserInput = e => {
     const fieldType = e.target.id;
@@ -118,8 +119,15 @@ const AddClient = () => {
     const file = e.target.files[0];
     const reader = new window.FileReader();
 
-    reader.onload = () => {
-      setClient({ ...client, image: reader.result });
+    reader.onloadstart = () => {
+      setButton(false);
+    };
+
+    reader.onloadend = () => {
+      if (reader.readyState === 2) {
+        setClient({ ...client, image: reader.result });
+        setButton(true);
+      }
     };
 
     reader.readAsDataURL(file);
@@ -180,7 +188,7 @@ const AddClient = () => {
           <Button as={Link} cancel="true" to={routes.clients}>
             Cancel
           </Button>
-          <Button type="submit" onClick={e => handleSubmit(e)}>
+          <Button disabled={!buttonActive} type="submit" onClick={e => handleSubmit(e)}>
             Save
           </Button>
         </StyledSubmittingContainer>
