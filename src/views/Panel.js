@@ -16,7 +16,7 @@ const Panel = () => (
   <StyledContainer>
     <PageTitle>Dashboard</PageTitle>
     <Card cardTitle="Clients">
-      <Button as={Link} to={routes.clients} secondary>
+      <Button as={Link} to={routes.clients} secondary="true">
         All clients
       </Button>
       <Button as={Link} to={routes.addClient}>
@@ -24,8 +24,8 @@ const Panel = () => (
       </Button>
     </Card>
     <Card cardTitle="Appointments">
-      <Button secondary>Manage appointments</Button>
-      <Button secondary>Callendar</Button>
+      <Button secondary="true">Manage appointments</Button>
+      <Button secondary="true">Callendar</Button>
       <Button>New appointment</Button>
     </Card>
   </StyledContainer>

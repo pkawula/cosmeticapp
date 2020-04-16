@@ -137,7 +137,7 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => {
+const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
   const { dispatch } = useContext(ClientsContext);
 
   const [modalOpened, setModal] = useState(false);
@@ -147,14 +147,14 @@ const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => {
   };
 
   const toggleModal = () => {
-    setModal({ modalOpened: !modalOpened });
+    setModal(!modalOpened);
   };
 
   return (
     <StyledWrapper>
       <StyledTopContainer>
         <StyledIconsContainer>
-          <ButtonIcon onClick={() => deleteClient(userID)} src={TrashIcon} alt="Delete" />
+          <ButtonIcon onClick={() => deleteClient(clientID)} src={TrashIcon} alt="Delete" />
           <ButtonIcon onClick={() => toggleModal()} src={PenIcon} alt="Edit" />
         </StyledIconsContainer>
         <StyledImageContainer topCustomer={topCustomer}>
@@ -187,7 +187,7 @@ const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => {
           email={email}
           phone={phone}
           image={image}
-          userID={userID}
+          clientID={clientID}
         />
       )}
     </StyledWrapper>
@@ -195,16 +195,17 @@ const ClientCard = ({ topCustomer, name, phone, email, image, userID }) => {
 };
 
 ClientCard.propTypes = {
-  topCustomer: propTypes.bool,
   name: propTypes.string.isRequired,
   email: propTypes.string.isRequired,
   phone: propTypes.string.isRequired,
-  image: propTypes.string.isRequired,
-  userID: propTypes.string.isRequired,
+  clientID: propTypes.string.isRequired,
+  topCustomer: propTypes.bool,
+  image: propTypes.string,
 };
 
 ClientCard.defaultProps = {
   topCustomer: false,
+  image: null,
 };
 
 export default ClientCard;

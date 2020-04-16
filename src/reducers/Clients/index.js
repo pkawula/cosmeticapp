@@ -1,6 +1,6 @@
 export const ADD_CLIENT = 'ADD_CLIENT';
 export const REMOVE_CLIENT = 'REMOVE_CLIENT';
-// export const UPDATE_CLIENT = 'UPDATE_CLIENT';
+export const UPDATE_CLIENT = 'UPDATE_CLIENT';
 
 const generateClientId = () =>
   Math.random()
@@ -14,11 +14,16 @@ export const Clients = (state, action) => {
         ...state,
         {
           ...action.payload,
-          userID: generateClientId(),
+          clientID: generateClientId(),
         },
       ];
     case REMOVE_CLIENT:
-      return state.filter(client => client.userID !== action.id);
+      return state.filter(client => client.clientID !== action.id);
+    case UPDATE_CLIENT:
+      return [
+        ...state.filter(client => client.clientID !== action.payload.clientID),
+        action.payload,
+      ];
     default:
       return state;
   }

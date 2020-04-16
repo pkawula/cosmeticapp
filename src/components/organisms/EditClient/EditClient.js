@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import propTypes from 'prop-types';
 import ProfilePicture from 'images/person.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
-import { Clients } from 'actions';
+import { ClientsContext } from 'contexts/Clients';
+import { UPDATE_CLIENT } from 'reducers/Clients';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -123,89 +124,123 @@ const StyledCloseButton = styled.button`
   }
 `;
 
-class EditClient extends React.Component {
-  state = { name: '', email: '', phone: '', image: '' };
+const ErrorContainer = styled.div`
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  position: fixed;
+  flex-direction: column;
+  top: 2em;
+  right: 2em;
+`;
 
-  componentDidMount() {
-    const { name, email, phone, image } = this.props;
-    this.setState({ name, email, phone, image });
-  }
+const ErrorMessage = styled.span`
+  display: block;
+  margin: 0.5em 0;
+  padding: 1em;
+  font-size: ${({ theme }) => theme.fontSize.xs};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  color: ${({ theme }) => theme.light};
+  text-align: center;
+  background-color: ${({ type, theme }) =>
+    (type === 'success' && theme.success) || (type === 'error' && theme.cancel)};
+  border-radius: 0.5em;
+`;
 
-  onUserInput = e => {
-    const fieldName = e.target.id;
-    const fieldValue = e.target.value;
+const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) => {
+  const { dispatch } = useContext(ClientsContext);
+  const [client, setClient] = useState({ name, email, phone, image, clientID });
+  const [error, setError] = useState('');
 
-    this.setState({
-      [fieldName]: fieldValue,
-    });
-  };
-
-  onImageChange = e => {
+  const onImageChange = e => {
     const file = e.target.files[0];
     const reader = new window.FileReader();
 
     reader.onload = () => {
-      this.setState({ image: reader.result });
+      setClient({ ...client, image: reader.result });
     };
 
     reader.readAsDataURL(file);
   };
 
-  saveUpdated = id => {
-    const { name, phone, image, email } = this.state;
-    const allClients = JSON.parse(Clients.get());
+  const onUserInput = e => {
+    const fieldName = e.target.id;
+    const fieldValue = e.target.value;
 
-    const clients = allClients.filter(({ userID }) => userID !== id);
-
-    clients.push({ name, phone, email, image, userID: id });
-
-    Clients.update(clients);
+    setClient({ ...client, [fieldName]: fieldValue });
   };
 
-  render() {
-    const { toggleModalFunc, userID } = this.props;
-    const { name, email, phone, image } = this.state;
+  const onSave = e => {
+    e.preventDefault();
 
-    return (
-      <StyledWrapper>
-        <StyledCloseButton onClick={toggleModalFunc} />
-        <StyledLabelContainer>
-          <StyledLabel title="add/change image">
-            <StyledImage src={image || ProfilePicture} alt="Profile picture" />
-            <StyledInputField
-              onChange={e => this.onImageChange(e)}
-              type="file"
-              accept="image/*"
-              name="addImage"
-            />
-          </StyledLabel>
-        </StyledLabelContainer>
-        <InputField onChange={this.onUserInput} value={name} placeholder="name" id="name" />
-        <InputField onChange={this.onUserInput} value={phone} placeholder="phone" id="phone" />
-        <InputField onChange={this.onUserInput} value={email} placeholder="email" id="email" />
-        <Button cancel onClick={toggleModalFunc}>
-          Cancel
-        </Button>
-        <Button
-          onClick={() => {
-            this.saveUpdated(userID);
-            toggleModalFunc();
-          }}
-        >
-          Save
-        </Button>
-      </StyledWrapper>
-    );
-  }
-}
+    if (client.name && client.phone && client.email) {
+      dispatch({ type: UPDATE_CLIENT, payload: { ...client } });
+      setClient({});
+      setError({ type: 'success', message: 'Client added successfully' });
+      setTimeout(() => setError(''), 1000);
+    } else {
+      setError({ type: 'error', message: 'Fill in all fields!' });
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  return (
+    <StyledWrapper>
+      <StyledCloseButton onClick={() => toggleModalFunc()} />
+      <StyledLabelContainer>
+        <StyledLabel title="add/change image">
+          <StyledImage src={client.image || ProfilePicture} alt="Profile picture" />
+          <StyledInputField
+            onChange={e => onImageChange(e)}
+            type="file"
+            accept="image/*"
+            name="addImage"
+          />
+        </StyledLabel>
+      </StyledLabelContainer>
+      <InputField onChange={e => onUserInput(e)} value={client.name} placeholder="name" id="name" />
+      <InputField
+        onChange={e => onUserInput(e)}
+        value={client.phone}
+        placeholder="phone"
+        id="phone"
+      />
+      <InputField
+        onChange={e => onUserInput(e)}
+        value={client.email}
+        placeholder="email"
+        id="email"
+      />
+      <Button cancel onClick={() => toggleModalFunc()}>
+        Cancel
+      </Button>
+      <Button
+        type="submit"
+        onClick={e => {
+          onSave(e);
+          toggleModalFunc();
+        }}
+      >
+        Save
+      </Button>
+      <ErrorContainer>
+        {error && <ErrorMessage type={error.type}>{error.message}</ErrorMessage>}
+      </ErrorContainer>
+    </StyledWrapper>
+  );
+};
 
 EditClient.propTypes = {
   name: propTypes.string.isRequired,
   phone: propTypes.string.isRequired,
   email: propTypes.string.isRequired,
-  image: propTypes.string.isRequired,
-  userID: propTypes.string.isRequired,
+  clientID: propTypes.string.isRequired,
   toggleModalFunc: propTypes.func.isRequired,
+  image: propTypes.string,
+};
+
+EditClient.defaultProps = {
+  image: null,
 };
 
 export default EditClient;

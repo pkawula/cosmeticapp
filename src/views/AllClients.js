@@ -45,14 +45,14 @@ const AllClients = () => {
       <PageTitle>All clients</PageTitle>
       <StyledCardContainer>
         {clients || clients === [null] ? (
-          clients.map(({ name, phone, email, image, userID }) => (
+          clients.map(({ name, phone, email, image, clientID }) => (
             <ClientCard
-              key={userID}
+              key={clientID}
               name={name}
               phone={phone}
               email={email}
               image={image}
-              userID={userID}
+              clientID={clientID}
             />
           ))
         ) : (
