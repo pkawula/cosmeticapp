@@ -17,9 +17,14 @@ const StyledWrapper = styled.div`
   margin: 2em auto;
 `;
 
-const StyledLabel = styled.label`
-  display: block;
+const StyledLabelContainer = styled.div`
+  display: flex;
   width: 100%;
+  align-items: center;
+`;
+
+const StyledLabel = styled.label`
+  display: inline-block;
   margin: 0 auto 1em;
   position: relative;
 
@@ -74,8 +79,9 @@ const StyledForm = styled.form`
 
 const StyledSubmittingContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   margin-top: 1em;
 `;
 
@@ -149,15 +155,17 @@ const AddClient = () => {
 
   return (
     <StyledWrapper>
-      <StyledLabel title="add/change image">
-        <StyledImage src={client.image || ProfilePicture} alt="Profile picture" />
-        <StyledInputField
-          type="file"
-          accept="image/*"
-          onChange={e => getImageDetails(e)}
-          name="addImage"
-        />
-      </StyledLabel>
+      <StyledLabelContainer>
+        <StyledLabel title="add/change image">
+          <StyledImage src={client.image || ProfilePicture} alt="Profile picture" />
+          <StyledInputField
+            type="file"
+            accept="image/*"
+            onChange={e => getImageDetails(e)}
+            name="addImage"
+          />
+        </StyledLabel>
+      </StyledLabelContainer>
       <StyledForm>
         <InputField
           type="text"
@@ -185,11 +193,14 @@ const AddClient = () => {
           value={client.email ? client.email : ''}
         />
         <StyledSubmittingContainer>
-          <Button as={Link} cancel="true" to={routes.clients}>
+          <Button as={Link} cancel="true" to={routes.home}>
             Cancel
           </Button>
           <Button disabled={!buttonActive} type="submit" onClick={e => handleSubmit(e)}>
             Save
+          </Button>
+          <Button secondary="true" as={Link} to={routes.clients}>
+            All clients
           </Button>
         </StyledSubmittingContainer>
       </StyledForm>

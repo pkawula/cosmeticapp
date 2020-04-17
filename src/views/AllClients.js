@@ -44,7 +44,7 @@ const AllClients = () => {
     <StyledWrapper>
       <PageTitle>All clients</PageTitle>
       <StyledCardContainer>
-        {clients || clients === [null] ? (
+        {clients.length ? (
           clients.map(({ name, phone, email, image, clientID }) => (
             <ClientCard
               key={clientID}
