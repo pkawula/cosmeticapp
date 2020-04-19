@@ -20,6 +20,17 @@ const StyledInput = styled.input`
   border-radius: 0.5em 0.5em 0 0;
   background: transparent;
 
+  & ~ span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(0.5em, 2em);
+    font-size: 1em;
+    transition: transform 0.3s ease-in-out;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
   &:focus ~ span,
   &:active ~ span,
   &:not([value='']) ~ span {
@@ -34,21 +45,10 @@ const StyledInput = styled.input`
   }
 `;
 
-const StyledInputName = styled.span`
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: translate(0.5em, 2em);
-  font-size: ${({ theme }) => theme.fontSize.s};
-  transition: transform 0.3s ease-in-out;
-  opacity: 0.6;
-  pointer-events: none;
-`;
-
 const InputField = ({ type, name, placeholder, ...props }) => (
   <StyledWrapper>
     <StyledInput type={type} {...name} {...props} />
-    <StyledInputName>{placeholder}</StyledInputName>
+    <span>{placeholder}</span>
   </StyledWrapper>
 );
 

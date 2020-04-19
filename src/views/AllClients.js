@@ -6,6 +6,7 @@ import { routes } from 'routes';
 import { Link } from 'react-router-dom';
 import Button from 'components/atoms/Button/Button';
 import { ClientsContext } from 'contexts/Clients';
+import SearchBar from 'components/molecules/SearchBar/SearchBar';
 
 const StyledWrapper = styled.div`
   display: block;
@@ -37,12 +38,21 @@ const StyledInfo = styled.p`
   width: 100%;
 `;
 
+const TopContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 const AllClients = () => {
   const { clients } = useContext(ClientsContext);
 
   return (
     <StyledWrapper>
-      <PageTitle>All clients</PageTitle>
+      <TopContainer>
+        <PageTitle>All clients</PageTitle>
+        <SearchBar />
+      </TopContainer>
       <StyledCardContainer>
         {clients.length ? (
           clients.map(({ name, phone, email, image, clientID }) => (
