@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import ClientCard from 'components/molecules/ClientCard/ClientCard';
 import styled from 'styled-components';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
@@ -42,29 +42,46 @@ const TopContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: -0.5em;
 `;
 
 const AllClients = () => {
   const { clients } = useContext(ClientsContext);
+  const [searchedValue, setValue] = useState('');
+
+  const searchClient = (object, phrase) => {
+    const keys = ['name', 'phone', 'email'];
+
+    return keys.find(key => {
+      return object[key].toLowerCase().includes(phrase.toLowerCase());
+    });
+  };
+
+  const onUserInput = e => {
+    const searchedPhrase = e.target.value;
+    setValue(searchedPhrase);
+  };
 
   return (
     <StyledWrapper>
       <TopContainer>
         <PageTitle>All clients</PageTitle>
-        <SearchBar />
+        <SearchBar onUserInput={onUserInput} value={searchedValue} />
       </TopContainer>
       <StyledCardContainer>
         {clients.length ? (
-          clients.map(({ name, phone, email, image, clientID }) => (
-            <ClientCard
-              key={clientID}
-              name={name}
-              phone={phone}
-              email={email}
-              image={image}
-              clientID={clientID}
-            />
-          ))
+          clients
+            .filter(client => searchClient(client, searchedValue))
+            .map(({ name, phone, email, image, clientID }) => (
+              <ClientCard
+                key={clientID}
+                name={name}
+                phone={phone}
+                email={email}
+                image={image}
+                clientID={clientID}
+              />
+            ))
         ) : (
           <>
             <StyledInfo>No clients yet</StyledInfo>

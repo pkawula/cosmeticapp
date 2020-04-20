@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
+import propTypes from 'prop-types';
 import SearchIcon from 'images/icons/search.svg';
 import InputField from 'components/atoms/InputField/InputField';
 
@@ -42,26 +43,24 @@ const StyledInputField = styled(InputField)`
   }
 `;
 
-const SearchBar = () => {
-  const [searchText, setText] = useState('');
-
-  const onUserInput = e => {
-    const inputValue = e.target.value;
-
-    setText(inputValue);
-  };
-
+const SearchBar = ({ onUserInput, value }) => {
   return (
     <StyledWrapper>
       <StyledInputField
         type="text"
-        onChange={onUserInput}
-        value={searchText}
+        onChange={e => onUserInput(e)}
+        value={value}
         placeholder="Search"
+        name="searchbar"
       />
       <StyledImage src={SearchIcon} alt="Search" />
     </StyledWrapper>
   );
+};
+
+SearchBar.propTypes = {
+  onUserInput: propTypes.func.isRequired,
+  value: propTypes.string.isRequired,
 };
 
 export default SearchBar;
