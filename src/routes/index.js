@@ -3,7 +3,7 @@ export const routes = {
   clients: '/clients',
   addClient: '/clients/add',
   appointments: '/appointments',
-  callendar: '/callendar',
+  calendar: '/calendar',
   addAppointment: '/appointments/add',
   settings: '/settings',
   login: '/login',

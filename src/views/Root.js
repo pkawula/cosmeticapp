@@ -7,6 +7,7 @@ import { theme } from 'theme/mainTheme';
 import GlobalStyle from 'theme/GlobalStyle';
 import Panel from 'views/Panel';
 import ClientsContextProvider from 'contexts/Clients';
+import Calendar from 'components/organisms/Calendar/Calendar';
 import AddClient from './AddClient';
 import AllClients from './AllClients';
 
@@ -21,6 +22,7 @@ const Root = () => (
           <Route exact path={routes.home} component={Panel} />
           <Route path={routes.addClient} component={AddClient} />
           <Route path={routes.clients} component={AllClients} />
+          <Route path={routes.calendar} component={Calendar} />
         </Switch>
       </ClientsContextProvider>
     </ThemeProvider>
