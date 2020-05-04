@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
@@ -88,51 +88,94 @@ const StyledWeekName = styled.li`
   text-transform: uppercase;
 `;
 
-const StyledMonthDaysContainer = styled.div`
-  display: block;
-  margin: 0;
-  width: 100%;
-`;
-
-const StyledWeekDaysContainer = styled.ul`
+const StyledMonthDaysContainer = styled.ul`
   display: flex;
-  flex-wrap: nowrap;
+  width: 100%;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   margin: 0;
-  padding: 0 0.5em;
+  padding: 0;
   margin-top: 1em;
   list-style: none;
 `;
 
 const StyledDay = styled.li`
   display: block;
-  width: 2.5em;
-  height: 2.5em;
+  width: 14.285%;
+  max-width: 2.5em;
+  height: 14.285%;
   line-height: 2.5em;
   font-size: ${({ theme }) => theme.fontSize.s};
   font-weight: ${({ theme }) => theme.fontWeight.normal};
   text-align: center;
   text-transform: uppercase;
   border-radius: 50%;
-  margin: 0;
+  margin: 0.5em 3px;
   padding: 0;
-  background: #f0f0f0;
+  background: ${({ today }) => (today ? 'hsl(263, 45%, 56%)' : 'hsl(0, 0%, 94%)')};
+  color: ${({ today, theme }) => (today ? theme.light : theme.black)};
+  opacity: ${({ elseMonth }) => (elseMonth ? 0.5 : 1)};
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
 `;
 
 const Calendar = () => {
+  const getStartDayOfMonth = currentDate => {
+    return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+  };
+
+  const getEndDayOfMonth = currentDate => {
+    return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDay();
+  };
+
+  const getDaysOfMonth = currentMonth => {
+    return new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+  };
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const today = new Date();
+  const [date, setDate] = useState(today);
+  const [day, setDay] = useState(today.getDate());
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+  const [startDay, setStartDay] = useState(getStartDayOfMonth(date));
+  const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
+  const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
+
+  useEffect(() => {
+    setDay(date.getDate());
+    setMonth(date.getMonth());
+    setYear(date.getFullYear());
+    setStartDay(getStartDayOfMonth(date));
+    setEndDay(getEndDayOfMonth(date));
+    setDaysInMonth(getDaysOfMonth(date));
+  }, [date]);
+
   return (
     <StyledWrapper>
       <StyledNavigationContainer>
-        <StyledButtonIcon left="true">
+        <StyledButtonIcon onClick={() => setDate(new Date(year, month - 1, day))} left="true">
           <ArrowImage />
         </StyledButtonIcon>
         <StyledDateInfo>
-          <StyledYear>2020</StyledYear>
-          <StyledMonthName>may</StyledMonthName>
+          <StyledYear>{year}</StyledYear>
+          <StyledMonthName>{months[month]}</StyledMonthName>
         </StyledDateInfo>
-        <StyledButtonIcon>
+        <StyledButtonIcon onClick={() => setDate(new Date(year, month + 1, day))}>
           <ArrowImage />
         </StyledButtonIcon>
       </StyledNavigationContainer>
@@ -147,47 +190,22 @@ const Calendar = () => {
           <StyledWeekName>SUN</StyledWeekName>
         </StyledWeekNamesContainer>
         <StyledMonthDaysContainer>
-          <StyledWeekDaysContainer>
-            <StyledDay>1</StyledDay>
-            <StyledDay>2</StyledDay>
-            <StyledDay>3</StyledDay>
-            <StyledDay>4</StyledDay>
-            <StyledDay>5</StyledDay>
-            <StyledDay>6</StyledDay>
-            <StyledDay>7</StyledDay>
-          </StyledWeekDaysContainer>
-          <StyledWeekDaysContainer>
-            <StyledDay>8</StyledDay>
-            <StyledDay>9</StyledDay>
-            <StyledDay>10</StyledDay>
-            <StyledDay>11</StyledDay>
-            <StyledDay>12</StyledDay>
-            <StyledDay>13</StyledDay>
-            <StyledDay>14</StyledDay>
-          </StyledWeekDaysContainer>
-          <StyledWeekDaysContainer>
-            <StyledDay>15</StyledDay>
-            <StyledDay>16</StyledDay>
-            <StyledDay>17</StyledDay>
-            <StyledDay>18</StyledDay>
-            <StyledDay>19</StyledDay>
-            <StyledDay>20</StyledDay>
-            <StyledDay>21</StyledDay>
-          </StyledWeekDaysContainer>
-          <StyledWeekDaysContainer>
-            <StyledDay>22</StyledDay>
-            <StyledDay>23</StyledDay>
-            <StyledDay>24</StyledDay>
-            <StyledDay>25</StyledDay>
-            <StyledDay>26</StyledDay>
-            <StyledDay>27</StyledDay>
-            <StyledDay>28</StyledDay>
-          </StyledWeekDaysContainer>
-          <StyledWeekDaysContainer>
-            <StyledDay>29</StyledDay>
-            <StyledDay>30</StyledDay>
-            <StyledDay>31</StyledDay>
-          </StyledWeekDaysContainer>
+          {console.log(`Start day: ${startDay} (expected 5). End day: ${endDay} (expected 0)`)}
+          {Array(daysInMonth + (startDay - 1) + (7 - endDay))
+            .fill(null)
+            .map((_, index) => {
+              const d = index - (startDay - 2);
+
+              return (
+                <StyledDay
+                  key={d}
+                  today={d === today.getDate()}
+                  elseMonth={d <= 0 || d > daysInMonth}
+                >
+                  {d <= 0 || d > daysInMonth ? new Date(year, month, d).getDate() : d}
+                </StyledDay>
+              );
+            })}
         </StyledMonthDaysContainer>
       </StyledCalendarContainer>
     </StyledWrapper>
