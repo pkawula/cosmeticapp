@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
+import CalendarModal from './CalendarModal';
 
 const StyledWrapper = styled.div`
   display: block;
@@ -10,16 +11,17 @@ const StyledWrapper = styled.div`
   width: 100%;
   max-width: 436px;
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
+  position: relative;
 `;
 
-const StyledNavigationContainer = styled.div`
+export const StyledNavigationContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
-const StyledButtonIcon = styled(ButtonIcon)`
+export const StyledButtonIcon = styled(ButtonIcon)`
   display: block;
   height: 5em;
   width: 5em;
@@ -36,12 +38,13 @@ const StyledButtonIcon = styled(ButtonIcon)`
     `};
 `;
 
-const StyledDateInfo = styled.div`
+export const StyledDateInfo = styled.div`
   display: block;
   margin: 0 0.9em;
+  cursor: pointer;
 `;
 
-const StyledYear = styled.h1`
+export const StyledYear = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.l};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   text-transform: uppercase;
@@ -50,7 +53,7 @@ const StyledYear = styled.h1`
   line-height: 1;
 `;
 
-const StyledMonthName = styled.p`
+export const StyledMonthName = styled.p`
   margin: 0;
   font-size: ${({ theme }) => theme.fontSize.s};
   font-weight: ${({ theme }) => theme.fontWeight.normal};
@@ -64,6 +67,13 @@ const StyledCalendarContainer = styled.div`
   display: block;
   width: 100%;
   margin: 0 auto;
+  ${({ modalOpened }) =>
+    modalOpened &&
+    css`
+       {
+        opacity: 0.3;
+      }
+    `}
 `;
 
 const StyledWeekNamesContainer = styled.ul`
@@ -119,6 +129,15 @@ const StyledDay = styled.li`
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
 `;
 
+const StyledModal = styled.div`
+  display: block;
+  width: auto;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
 const Calendar = () => {
   const getStartDayOfMonth = currentDate => {
     return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -147,6 +166,8 @@ const Calendar = () => {
     'December',
   ];
 
+  const weekDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
   const today = new Date();
   const [date, setDate] = useState(today);
   const [day, setDay] = useState(today.getDate());
@@ -155,6 +176,7 @@ const Calendar = () => {
   const [startDay, setStartDay] = useState(getStartDayOfMonth(date));
   const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
   const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
+  const [modalOpened, setModal] = useState(false);
 
   useEffect(() => {
     setDay(date.getDate());
@@ -165,13 +187,15 @@ const Calendar = () => {
     setDaysInMonth(getDaysOfMonth(date));
   }, [date]);
 
+  const toggleModal = () => setModal(!modalOpened);
+
   return (
     <StyledWrapper>
       <StyledNavigationContainer>
         <StyledButtonIcon onClick={() => setDate(new Date(year, month - 1, day))} left="true">
           <ArrowImage />
         </StyledButtonIcon>
-        <StyledDateInfo>
+        <StyledDateInfo onClick={() => toggleModal()}>
           <StyledYear>{year}</StyledYear>
           <StyledMonthName>{months[month]}</StyledMonthName>
         </StyledDateInfo>
@@ -179,15 +203,11 @@ const Calendar = () => {
           <ArrowImage />
         </StyledButtonIcon>
       </StyledNavigationContainer>
-      <StyledCalendarContainer>
+      <StyledCalendarContainer modalOpened={modalOpened}>
         <StyledWeekNamesContainer>
-          <StyledWeekName>MON</StyledWeekName>
-          <StyledWeekName>TUE</StyledWeekName>
-          <StyledWeekName>WED</StyledWeekName>
-          <StyledWeekName>THU</StyledWeekName>
-          <StyledWeekName>FRI</StyledWeekName>
-          <StyledWeekName>SAT</StyledWeekName>
-          <StyledWeekName>SUN</StyledWeekName>
+          {weekDays.map(weekDay => (
+            <StyledWeekName key={weekDay}>{weekDay}</StyledWeekName>
+          ))}
         </StyledWeekNamesContainer>
         <StyledMonthDaysContainer>
           {console.log(`Start day: ${startDay} (expected 5). End day: ${endDay} (expected 0)`)}
@@ -208,6 +228,19 @@ const Calendar = () => {
             })}
         </StyledMonthDaysContainer>
       </StyledCalendarContainer>
+      {modalOpened && (
+        <StyledModal>
+          <CalendarModal
+            date={date}
+            NavigationContainer={StyledNavigationContainer}
+            months={months}
+            toggleModal={() => toggleModal()}
+            toggleMonth={toMonth => setDate(new Date(year, toMonth, day))}
+            year={year}
+            setYear={toYear => setDate(new Date(toYear, month, day))}
+          />
+        </StyledModal>
+      )}
     </StyledWrapper>
   );
 };

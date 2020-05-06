@@ -25,7 +25,9 @@ const Panel = () => (
     </Card>
     <Card cardTitle="Appointments">
       <Button secondary="true">Manage appointments</Button>
-      <Button secondary="true">Callendar</Button>
+      <Button as={Link} to={routes.calendar} secondary="true">
+        Calendar
+      </Button>
       <Button>New appointment</Button>
     </Card>
   </StyledContainer>
