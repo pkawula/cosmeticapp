@@ -210,7 +210,6 @@ const Calendar = () => {
           ))}
         </StyledWeekNamesContainer>
         <StyledMonthDaysContainer>
-          {console.log(`Start day: ${startDay} (expected 5). End day: ${endDay} (expected 0)`)}
           {Array(daysInMonth + (startDay - 1) + (7 - endDay))
             .fill(null)
             .map((_, index) => {
@@ -231,12 +230,11 @@ const Calendar = () => {
       {modalOpened && (
         <StyledModal>
           <CalendarModal
-            date={date}
-            NavigationContainer={StyledNavigationContainer}
             months={months}
+            currentMonth={month}
+            currentYear={year}
             toggleModal={() => toggleModal()}
             toggleMonth={toMonth => setDate(new Date(year, toMonth, day))}
-            year={year}
             setYear={toYear => setDate(new Date(toYear, month, day))}
           />
         </StyledModal>
