@@ -7,7 +7,7 @@ import CalendarModal from './CalendarModal';
 const StyledWrapper = styled.div`
   display: block;
   margin: 2em auto;
-  padding: 1em;
+  padding: 0;
   width: 100%;
   max-width: 436px;
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
@@ -99,7 +99,9 @@ const StyledWeekName = styled.li`
 `;
 
 const StyledMonthDaysContainer = styled.ul`
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-gap: 3px;
   width: 100%;
   flex-wrap: wrap;
   align-items: center;
@@ -112,21 +114,52 @@ const StyledMonthDaysContainer = styled.ul`
 
 const StyledDay = styled.li`
   display: block;
-  width: 14.285%;
+  width: 100%;
   max-width: 2.5em;
-  height: 14.285%;
+  height: 2.5em;
   line-height: 2.5em;
   font-size: ${({ theme }) => theme.fontSize.s};
   font-weight: ${({ theme }) => theme.fontWeight.normal};
   text-align: center;
   text-transform: uppercase;
   border-radius: 50%;
-  margin: 0.5em 3px;
+  margin: 0.5em 5px;
   padding: 0;
   background: ${({ today }) => (today ? 'hsl(263, 45%, 56%)' : 'hsl(0, 0%, 94%)')};
   color: ${({ today, theme }) => (today ? theme.light : theme.black)};
   opacity: ${({ elseMonth }) => (elseMonth ? 0.5 : 1)};
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
+  position: relative;
+
+  /*  this will add info about (number of) events on calendar day
+  ${({ isReserved }) =>
+    isReserved &&
+    css`
+      &::before {
+        content: '';
+        width: 1.2em;
+        height: 1.2em;
+        position: absolute;
+        bottom: -0.2em;
+        left: -0.2em;
+        background-color: ${({ theme }) => theme.secondary};
+        border-radius: 50%;
+      }
+
+      &::after {
+        content: '5';
+        width: 1.2em;
+        height: 1.2em;
+        line-height: 1.2em;
+        font-size: ${({ theme }) => theme.fontSize.s};
+        font-weight: ${({ theme }) => theme.fontWeight.semiBold};
+        color: ${({ theme }) => theme.light};
+        position: absolute;
+        bottom: -0.2em;
+        left: -0.2em;
+        z-index: 1;
+      }
+    `}; */
 `;
 
 const StyledModal = styled.div`
