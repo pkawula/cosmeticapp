@@ -40,7 +40,7 @@ export const StyledButtonIcon = styled(ButtonIcon)`
 
 export const StyledDateInfo = styled.div`
   display: block;
-  margin: 0 0.9em;
+  margin: 0 0.5em;
   cursor: pointer;
 `;
 
@@ -80,7 +80,7 @@ const StyledWeekNamesContainer = styled.ul`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   background: #f0f0f0;
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
   padding: 0.5em;
@@ -90,9 +90,11 @@ const StyledWeekNamesContainer = styled.ul`
 
 const StyledWeekName = styled.li`
   display: block;
-  width: 14.285%;
+  flex-basis: 13%;
+  margin: 0 auto;
+  max-width: 2em;
   height: auto;
-  font-size: ${({ theme }) => theme.fontSize.s};
+  font-size: ${({ theme }) => theme.fontSize.xs};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   text-align: center;
   text-transform: uppercase;
@@ -107,7 +109,7 @@ const StyledMonthDaysContainer = styled.ul`
   align-items: center;
   justify-content: space-between;
   margin: 0;
-  padding: 0;
+  padding: 0 0.5em;
   margin-top: 1em;
   list-style: none;
 `;
@@ -115,15 +117,15 @@ const StyledMonthDaysContainer = styled.ul`
 const StyledDay = styled.li`
   display: block;
   width: 100%;
-  max-width: 2.5em;
-  height: 2.5em;
-  line-height: 2.5em;
+  max-width: 2em;
+  height: 2em;
+  line-height: 2em;
   font-size: ${({ theme }) => theme.fontSize.s};
   font-weight: ${({ theme }) => theme.fontWeight.normal};
   text-align: center;
   text-transform: uppercase;
   border-radius: 50%;
-  margin: 0.5em 5px;
+  margin: 0.5em auto;
   padding: 0;
   background: ${({ today }) => (today ? 'hsl(263, 45%, 56%)' : 'hsl(0, 0%, 94%)')};
   color: ${({ today, theme }) => (today ? theme.light : theme.black)};
