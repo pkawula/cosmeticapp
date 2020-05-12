@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
+import Event from 'components/molecules/Event/Event';
 
 const StyledWrapper = styled.section`
   width: 100%;
@@ -32,6 +33,18 @@ const StyledNoEventInfo = styled.p`
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
 `;
 
+const StyledEventsWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  @media screen and (min-width: 768px) {
+    justify-content: flex-start;
+  }
+`;
+
 const CalendarView = () => {
   return (
     <StyledWrapper>
@@ -39,6 +52,20 @@ const CalendarView = () => {
       <Calendar />
       <StyledSectionTitle>Your day | 11th May</StyledSectionTitle>
       <StyledNoEventInfo>nothing planned.. get some rest :) </StyledNoEventInfo>
+      <StyledEventsWrapper>
+        <Event
+          time="9:30"
+          firstName="Piotr"
+          lastName="Kawula"
+          services={['manicure', 'pedicure']}
+        />
+        <Event
+          time="11:30"
+          firstName="Weronika"
+          lastName="Żurecka"
+          services={['manicure', 'henna', 'burger', 'fryty', 'picka', 'coca-cola']}
+        />
+      </StyledEventsWrapper>
     </StyledWrapper>
   );
 };
