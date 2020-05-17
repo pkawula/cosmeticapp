@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import propTypes from 'prop-types';
+import { ReactComponent as TrashIcon } from 'images/icons/delete_icon.svg';
+import { ReactComponent as PenIcon } from 'images/icons/pen_icon.svg';
 
 const EventWrapper = styled.div`
   margin: 1em;
@@ -35,7 +37,7 @@ const TimeText = styled.span`
   text-align: center;
   line-height: 1;
   margin: 0;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.2em;
 `;
 
 const ClientName = styled.span`
@@ -66,13 +68,47 @@ const Service = styled.p`
   margin: 0.5em 3px;
 `;
 
+const IconsContainer = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0 auto;
+`;
+
+const ButtonIcon = styled.button`
+  display: block;
+  margin: 0;
+  background: transparent;
+  border: none;
+  min-width: 2em;
+  min-height: 2em;
+  padding: 0.3em;
+`;
+
+const StyledTrashIcon = styled(TrashIcon)`
+  width: 2.5em;
+  height: 2.5em;
+`;
+
+const StyledPenIcon = styled(PenIcon)`
+  width: 2.5em;
+  height: 2.5em;
+`;
+
 const Event = ({ time, firstName, lastName, services }) => {
   const fullName = `${firstName} ${lastName}`;
-
   return (
     <EventWrapper>
       <InnerContainer>
         <TimeText>{time}</TimeText>
+        <IconsContainer>
+          <ButtonIcon>
+            <StyledTrashIcon />
+          </ButtonIcon>
+          <ButtonIcon>
+            <StyledPenIcon />
+          </ButtonIcon>
+        </IconsContainer>
       </InnerContainer>
       <InnerContainer>
         <ClientName>{fullName}</ClientName>
