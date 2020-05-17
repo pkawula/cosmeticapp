@@ -10,6 +10,7 @@ import ClientsContextProvider from 'contexts/Clients';
 import AddClient from './AddClient';
 import AllClients from './AllClients';
 import CalendarView from './CalendarView';
+import AddAppointment from './AddAppointment';
 
 const Root = () => (
   <BrowserRouter>
@@ -23,6 +24,7 @@ const Root = () => (
           <Route path={routes.addClient} component={AddClient} />
           <Route path={routes.clients} component={AllClients} />
           <Route path={routes.calendar} component={CalendarView} />
+          <Route path={routes.addAppointment} component={AddAppointment} />
         </Switch>
       </ClientsContextProvider>
     </ThemeProvider>

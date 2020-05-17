@@ -28,7 +28,9 @@ const Panel = () => (
       <Button as={Link} to={routes.calendar} secondary="true">
         Calendar
       </Button>
-      <Button>New appointment</Button>
+      <Button as={Link} to={routes.addAppointment}>
+        New appointment
+      </Button>
     </Card>
   </StyledContainer>
 );
