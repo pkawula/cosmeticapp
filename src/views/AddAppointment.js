@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import InputField from 'components/atoms/InputField/InputField';
+import Button from 'components/atoms/Button/Button';
 
 const Wrapper = styled.div`
   display: block;
@@ -60,6 +61,40 @@ const StyledMagnifierIcon = styled(MagnifierIcon)`
   max-height: ${({ theme }) => theme.fontSize.m};
 `;
 
+const StyledButton = styled(Button)`
+  display: block;
+`;
+
+const ServicesContainer = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+const Service = styled.div`
+  display: block;
+  width: 4em;
+  height: 4em;
+  margin: 0.5em;
+  padding: 0.5em;
+  border: 2px dotted ${({ theme }) => theme.black};
+  background: hsl(0, 0%, 94%);
+  position: relative;
+
+  &::before {
+    content: '+';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+    font-size: ${({ theme }) => theme.fontSize.l};
+    font-weight: ${({ theme }) => theme.fontWeight.bold};
+    text-align: center;
+  }
+`;
+
 const AddAppointment = () => {
   const [inputValue, setInputValue] = useState('');
 
@@ -80,6 +115,20 @@ const AddAppointment = () => {
           />
           <StyledMagnifierIcon />
         </SearchWrapper>
+      </Section>
+      <Section>
+        <SectionTitle>or add new one</SectionTitle>
+        <StyledButton>Add new client</StyledButton>
+      </Section>
+      <Section>
+        <SectionTitle>choose a service</SectionTitle>
+        <ServicesContainer>
+          <Service />
+          <Service />
+          <Service />
+          <Service />
+          <Service />
+        </ServicesContainer>
       </Section>
     </Wrapper>
   );
