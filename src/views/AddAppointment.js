@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
+import { ReactComponent as PersonIcon } from 'images/person.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 
@@ -29,7 +30,7 @@ const SectionTitle = styled.h2`
 const SearchWrapper = styled.label`
   display: block;
   width: 100%;
-  padding: 0.5em;
+  padding: 0 0.5em;
   font-size: ${({ theme }) => theme.fontSize.m};
   font-weight: ${({ theme }) => theme.fontWeight.normal};
   position: relative;
@@ -72,8 +73,9 @@ const ServicesContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const Service = styled.div`
+const Service = styled.button`
   display: block;
+  font-size: ${({ theme }) => theme.fontSize.s};
   width: 4em;
   height: 4em;
   margin: 0.5em;
@@ -81,6 +83,7 @@ const Service = styled.div`
   border: 2px dotted ${({ theme }) => theme.black};
   background: hsl(0, 0%, 94%);
   position: relative;
+  cursor: pointer;
 
   &::before {
     content: '+';
@@ -93,6 +96,114 @@ const Service = styled.div`
     font-weight: ${({ theme }) => theme.fontWeight.bold};
     text-align: center;
   }
+`;
+
+const DateContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 1em;
+  width: 100%;
+  box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
+`;
+
+const Date = styled.p`
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-size: ${({ theme }) => theme.fontSize.m};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  color: ${({ theme }) => theme.black};
+`;
+
+const TimeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const TimeButton = styled.button`
+  display: block;
+  font-size: ${({ theme }) => theme.fontSize.xl};
+  font-weight: ${({ theme }) => theme.fontWeight.bolder};
+  color: ${({ theme }) => theme.black};
+  text-align: center;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0 0.5em;
+`;
+
+const Time = styled.p`
+  display: block;
+  font-size: ${({ theme }) => theme.fontSize.m};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  color: ${({ theme }) => theme.black};
+  text-align: center;
+  margin: 0;
+  padding: 0;
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2em auto;
+`;
+
+const SearchResults = styled.ul`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 1em);
+  height: auto;
+  max-height: 200px;
+  overflow-y: auto;
+  list-style: none;
+  background: ${({ theme }) => theme.light};
+  border: 3px solid ${({ theme }) => theme.primary};
+  border-top: none;
+  z-index: 2;
+`;
+
+const Result = styled.li`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  padding: .5em 1em;
+  margin: 0;
+  /* border-bottom: 2px solid ${({ theme }) => theme.black}; */
+  transition: opacity .2s ease;
+  cursor: pointer;
+
+  &:hover {
+    opacity: .75;
+  }
+`;
+
+const StyledPersonIcon = styled(PersonIcon)`
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  margin-right: 0.5em;
+  border-radius: 50%;
+`;
+
+const PersonName = styled.span`
+  display: inline-block;
+  text-align: left;
+  margin-left: 0.5em;
+  font-size: ${({ theme }) => theme.fontSize.m};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  color: ${({ theme }) => theme.black};
 `;
 
 const AddAppointment = () => {
@@ -114,6 +225,24 @@ const AddAppointment = () => {
             value={inputValue}
           />
           <StyledMagnifierIcon />
+          <SearchResults>
+            <Result>
+              <StyledPersonIcon />
+              <PersonName>Piotr Kawula</PersonName>
+            </Result>
+            <Result>
+              <StyledPersonIcon />
+              <PersonName>Weronika Żurecka</PersonName>
+            </Result>
+            <Result>
+              <StyledPersonIcon />
+              <PersonName>John Doe</PersonName>
+            </Result>
+            <Result>
+              <StyledPersonIcon />
+              <PersonName>Jane Doe</PersonName>
+            </Result>
+          </SearchResults>
         </SearchWrapper>
       </Section>
       <Section>
@@ -130,6 +259,21 @@ const AddAppointment = () => {
           <Service />
         </ServicesContainer>
       </Section>
+      <Section>
+        <SectionTitle>select date</SectionTitle>
+        <DateContainer>
+          <Date>Wed, 20th May 2020</Date>
+          <TimeContainer>
+            <TimeButton>-</TimeButton>
+            <Time>21:30</Time>
+            <TimeButton>+</TimeButton>
+          </TimeContainer>
+        </DateContainer>
+      </Section>
+      <ButtonsContainer>
+        <Button cancel>Cancel</Button>
+        <Button>Save</Button>
+      </ButtonsContainer>
     </Wrapper>
   );
 };
