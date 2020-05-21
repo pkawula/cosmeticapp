@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import propTypes from 'prop-types';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import { ReactComponent as PersonIcon } from 'images/person.svg';
@@ -62,19 +63,100 @@ const StyledMagnifierIcon = styled(MagnifierIcon)`
   max-height: ${({ theme }) => theme.fontSize.m};
 `;
 
+const SearchResults = styled.ul`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 1em);
+  height: auto;
+  overflow-y: auto;
+  list-style: none;
+  background: ${({ theme }) => theme.light};
+  border: none;
+  border-bottom-right-radius: 0.5em;
+  border-bottom-left-radius: 0.5em;
+  z-index: 2;
+  box-shadow: 2px 5px 10px -1px hsla(0, 0%, 0%, 0.2);
+
+  transition: max-height 0.3s ease-in-out;
+
+  ${({ isEmpty }) =>
+    isEmpty
+      ? css`
+          max-height: 0;
+        `
+      : css`
+          max-height: 200px;
+        `};
+`;
+
+const Result = styled.li`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 0.5em 1em;
+  margin: 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  border-bottom: 1px solid ${({ theme }) => theme.black};
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const StyledPersonIcon = styled(PersonIcon)`
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  margin-right: 0.5em;
+  border-radius: 50%;
+`;
+
+const StyledPersonImage = styled.img`
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  margin-right: 0.5em;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+const PersonName = styled.span`
+  display: inline-block;
+  text-align: left;
+  margin-left: 0.5em;
+  font-size: ${({ theme }) => theme.fontSize.m};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  color: ${({ theme }) => theme.black};
+`;
+
 const StyledButton = styled(Button)`
   display: block;
 `;
 
 const ServicesContainer = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: wrap;
+  min-width: 100%;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 0.5em;
 `;
 
 const Service = styled.button`
-  display: block;
+  display: inline-block;
   font-size: ${({ theme }) => theme.fontSize.s};
   width: 4em;
   height: 4em;
@@ -151,62 +233,7 @@ const ButtonsContainer = styled.div`
   margin: 2em auto;
 `;
 
-const SearchResults = styled.ul`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  position: absolute;
-  margin: 0;
-  padding: 0;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 1em);
-  height: auto;
-  max-height: 200px;
-  overflow-y: auto;
-  list-style: none;
-  background: ${({ theme }) => theme.light};
-  border: 3px solid ${({ theme }) => theme.primary};
-  border-top: none;
-  z-index: 2;
-`;
-
-const Result = styled.li`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  padding: .5em 1em;
-  margin: 0;
-  /* border-bottom: 2px solid ${({ theme }) => theme.black}; */
-  transition: opacity .2s ease;
-  cursor: pointer;
-
-  &:hover {
-    opacity: .75;
-  }
-`;
-
-const StyledPersonIcon = styled(PersonIcon)`
-  display: inline-block;
-  width: 2em;
-  height: 2em;
-  margin-right: 0.5em;
-  border-radius: 50%;
-`;
-
-const PersonName = styled.span`
-  display: inline-block;
-  text-align: left;
-  margin-left: 0.5em;
-  font-size: ${({ theme }) => theme.fontSize.m};
-  font-weight: ${({ theme }) => theme.fontWeight.bold};
-  color: ${({ theme }) => theme.black};
-`;
-
-const AddAppointment = () => {
+const AddAppointment = ({ image }) => {
   const [inputValue, setInputValue] = useState('');
 
   const handleUserInput = e => setInputValue(e.target.value);
@@ -225,21 +252,21 @@ const AddAppointment = () => {
             value={inputValue}
           />
           <StyledMagnifierIcon />
-          <SearchResults>
+          <SearchResults isEmpty={inputValue === ''}>
             <Result>
-              <StyledPersonIcon />
+              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
               <PersonName>Piotr Kawula</PersonName>
             </Result>
             <Result>
-              <StyledPersonIcon />
+              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
               <PersonName>Weronika Żurecka</PersonName>
             </Result>
             <Result>
-              <StyledPersonIcon />
+              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
               <PersonName>John Doe</PersonName>
             </Result>
             <Result>
-              <StyledPersonIcon />
+              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
               <PersonName>Jane Doe</PersonName>
             </Result>
           </SearchResults>
@@ -252,6 +279,14 @@ const AddAppointment = () => {
       <Section>
         <SectionTitle>choose a service</SectionTitle>
         <ServicesContainer>
+          <Service />
+          <Service />
+          <Service />
+          <Service />
+          <Service />
+          <Service />
+          <Service />
+          <Service />
           <Service />
           <Service />
           <Service />
@@ -276,6 +311,14 @@ const AddAppointment = () => {
       </ButtonsContainer>
     </Wrapper>
   );
+};
+
+AddAppointment.propTypes = {
+  image: propTypes.string,
+};
+
+AddAppointment.defaultProps = {
+  image: null,
 };
 
 export default AddAppointment;
