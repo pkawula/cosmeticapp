@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
@@ -163,21 +163,30 @@ const Service = styled.button`
   margin: 0.5em;
   padding: 0.5em;
   border: 2px dotted ${({ theme }) => theme.black};
-  background: hsl(0, 0%, 94%);
   position: relative;
   cursor: pointer;
 
-  &::before {
-    content: '+';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    line-height: 1;
-    font-size: ${({ theme }) => theme.fontSize.l};
-    font-weight: ${({ theme }) => theme.fontWeight.bold};
-    text-align: center;
-  }
+  ${({ image }) =>
+    image
+      ? css`
+          background-image: url(${image});
+          background-position: center;
+          background-size: cover;
+        `
+      : css`
+          background: hsl(0, 0%, 94%);
+          &::before {
+            content: '+';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            line-height: 1;
+            font-size: ${({ theme }) => theme.fontSize.l};
+            font-weight: ${({ theme }) => theme.fontWeight.bold};
+            text-align: center;
+          }
+        `}
 `;
 
 const DateContainer = styled.div`
@@ -235,6 +244,38 @@ const ButtonsContainer = styled.div`
 
 const AddAppointment = ({ image }) => {
   const [inputValue, setInputValue] = useState('');
+  const [services, setServices] = useState([]);
+
+  const addImage = async imageName => {
+    const getUrl = await import(`images/icons/services/${imageName}.svg`);
+    const url = getUrl.default;
+    return Promise.resolve(url);
+  };
+
+  const getAllServices = () => {
+    const allIcons = require.context('../images/icons/services', false, /.*\.svg$/);
+    const icons = [];
+
+    allIcons.keys().map(key => {
+      const label = key.slice(key.indexOf('/') + 1, key.lastIndexOf('.'));
+      return icons.push(label);
+    });
+
+    return icons.map(label => ({ label, iconUrl: addImage(label) }));
+  };
+
+  const setAllServices = () => {
+    const allData = getAllServices().map(service =>
+      service.iconUrl.then(url => ({ label: service.label, iconUrl: url, chosen: false })),
+    );
+    return Promise.all(allData);
+  };
+
+  useEffect(() => {
+    setAllServices()
+      .then(data => setServices(data))
+      .catch(err => console.log(err));
+  }, []);
 
   const handleUserInput = e => setInputValue(e.target.value);
 
@@ -279,19 +320,13 @@ const AddAppointment = ({ image }) => {
       <Section>
         <SectionTitle>choose a service</SectionTitle>
         <ServicesContainer>
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
-          <Service />
+          {services ? (
+            services.map(({ label, iconUrl, chosen }) => (
+              <Service key={label} image={iconUrl} chosen={chosen} />
+            ))
+          ) : (
+            <p>No services yet</p>
+          )}
         </ServicesContainer>
       </Section>
       <Section>
