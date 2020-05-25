@@ -275,7 +275,7 @@ const AddAppointment = ({ image }) => {
     setAllServices()
       .then(data => setServices(data))
       .catch(err => console.log(err));
-  }, []);
+  });
 
   const handleUserInput = e => setInputValue(e.target.value);
 
