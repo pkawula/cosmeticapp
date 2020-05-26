@@ -246,36 +246,37 @@ const AddAppointment = ({ image }) => {
   const [inputValue, setInputValue] = useState('');
   const [services, setServices] = useState([]);
 
-  const addImage = async imageName => {
-    const getUrl = await import(`images/icons/services/${imageName}.svg`);
-    const url = getUrl.default;
-    return Promise.resolve(url);
-  };
-
-  const getAllServices = () => {
-    const allIcons = require.context('../images/icons/services', false, /.*\.svg$/);
-    const icons = [];
-
-    allIcons.keys().map(key => {
-      const label = key.slice(key.indexOf('/') + 1, key.lastIndexOf('.'));
-      return icons.push(label);
-    });
-
-    return icons.map(label => ({ label, iconUrl: addImage(label) }));
-  };
-
   const setAllServices = () => {
+    const getAllServices = () => {
+      const allIcons = require.context('../images/icons/services', false, /.*\.svg$/);
+      const icons = [];
+
+      const addImage = async imageName => {
+        const getUrl = await import(`images/icons/services/${imageName}.svg`);
+        const url = getUrl.default;
+        return Promise.resolve(url);
+      };
+
+      allIcons.keys().map(key => {
+        const label = key.slice(key.indexOf('/') + 1, key.lastIndexOf('.'));
+        return icons.push(label);
+      });
+
+      return icons.map(label => ({ label, iconUrl: addImage(label) }));
+    };
+
     const allData = getAllServices().map(service =>
       service.iconUrl.then(url => ({ label: service.label, iconUrl: url, chosen: false })),
     );
-    return Promise.all(allData);
+    const formattedData = Promise.all(allData)
+      .then(data => setServices(data))
+      .catch(err => console.log(err));
+    return formattedData;
   };
 
   useEffect(() => {
-    setAllServices()
-      .then(data => setServices(data))
-      .catch(err => console.log(err));
-  });
+    setAllServices();
+  }, []);
 
   const handleUserInput = e => setInputValue(e.target.value);
 
