@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import propTypes from 'prop-types';
+import { ClientsContext } from 'contexts/Clients';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import { ReactComponent as PersonIcon } from 'images/person.svg';
@@ -87,13 +87,13 @@ const SearchResults = styled.ul`
 
   transition: max-height 0.3s ease-in-out;
 
-  ${({ isEmpty }) =>
-    isEmpty
+  ${({ isEmpty, enterred }) =>
+    isEmpty || enterred
       ? css`
-          max-height: 0;
+          max-height: 200px;
         `
       : css`
-          max-height: 200px;
+          max-height: 0;
         `};
 `;
 
@@ -152,7 +152,7 @@ const ServicesContainer = styled.div`
   display: block;
   overflow-x: auto;
   white-space: nowrap;
-  padding-bottom: 0.5em;
+  padding: 2em 0;
 `;
 
 const Service = styled.button`
@@ -162,31 +162,68 @@ const Service = styled.button`
   height: 4em;
   margin: 0.5em;
   padding: 0.5em;
-  border: 2px dotted ${({ theme }) => theme.black};
+  border: 2px dashed ${({ theme }) => theme.black};
+  border-radius: 50%;
   position: relative;
   cursor: pointer;
+  box-shadow: 2px 5px 10px -1px hsla(0, 0%, 0%, 0.2);
 
   ${({ image }) =>
-    image
-      ? css`
-          background-image: url(${image});
-          background-position: center;
-          background-size: cover;
-        `
-      : css`
-          background: hsl(0, 0%, 94%);
-          &::before {
-            content: '+';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            line-height: 1;
-            font-size: ${({ theme }) => theme.fontSize.l};
-            font-weight: ${({ theme }) => theme.fontWeight.bold};
-            text-align: center;
-          }
-        `}
+      image
+        ? css`
+            background-image: url(${image});
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 75%;
+          `
+        : css`
+            background: hsl(0, 0%, 94%);
+            &::before {
+              content: '+';
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              line-height: 1;
+              font-size: ${({ theme }) => theme.fontSize.l};
+              font-weight: ${({ theme }) => theme.fontWeight.bold};
+              text-align: center;
+            }
+          `}
+    ::before {
+    content: attr(data-label);
+    width: fit-content;
+    padding: 0.3em;
+    font-size: ${({ theme }) => theme.fontSize.xs};
+    color: ${({ theme }) => theme.light};
+    text-align: center;
+    background: hsla(0, 0%, 0%, 0.3);
+    border-radius: 0.3em;
+    position: absolute;
+    top: calc(-2em - 10px);
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    transform-origin: bottom center;
+    transition: transform 0.3s ease-in-out;
+    z-index: 3;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: calc(22px - 2em);
+    left: 50%;
+    border: 10px solid transparent;
+    border-top: 10px solid hsla(0, 0%, 0%, 0.3);
+    transform: translateX(-50%) scale(0);
+    transform-origin: center;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &:hover::before,
+  &:hover::after {
+    transform: translateX(-50%) scale(1);
+  }
 `;
 
 const DateContainer = styled.div`
@@ -242,9 +279,11 @@ const ButtonsContainer = styled.div`
   margin: 2em auto;
 `;
 
-const AddAppointment = ({ image }) => {
+const AddAppointment = () => {
+  const { clients } = useContext(ClientsContext);
   const [inputValue, setInputValue] = useState('');
   const [services, setServices] = useState([]);
+  const [focused, setFocus] = useState(false);
 
   const setAllServices = () => {
     const getAllServices = () => {
@@ -280,6 +319,14 @@ const AddAppointment = ({ image }) => {
 
   const handleUserInput = e => setInputValue(e.target.value);
 
+  const handleSearch = (object, phrase) => {
+    const keys = ['name', 'phone', 'email'];
+
+    return keys.find(key => {
+      return object[key].toLowerCase().includes(phrase.toLowerCase());
+    });
+  };
+
   return (
     <Wrapper>
       <PageTitle>make new appointment</PageTitle>
@@ -287,30 +334,25 @@ const AddAppointment = ({ image }) => {
         <SectionTitle>Choose client</SectionTitle>
         <SearchWrapper>
           <InputSearchField
-            onChange={e => handleUserInput(e)}
             type="text"
             placeholder="Search"
             name="searchbar"
             value={inputValue}
+            onChange={e => handleUserInput(e)}
+            onFocus={() => setFocus(true)}
+            onBlur={() => setFocus(false)}
           />
           <StyledMagnifierIcon />
-          <SearchResults isEmpty={inputValue === ''}>
-            <Result>
-              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
-              <PersonName>Piotr Kawula</PersonName>
-            </Result>
-            <Result>
-              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
-              <PersonName>Weronika Żurecka</PersonName>
-            </Result>
-            <Result>
-              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
-              <PersonName>John Doe</PersonName>
-            </Result>
-            <Result>
-              {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
-              <PersonName>Jane Doe</PersonName>
-            </Result>
+          <SearchResults isEmpty={focused || inputValue !== ''}>
+            {clients &&
+              clients
+                .filter(client => handleSearch(client, inputValue))
+                .map(({ name, image, clientID }) => (
+                  <Result key={clientID}>
+                    {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
+                    <PersonName>{name}</PersonName>
+                  </Result>
+                ))}
           </SearchResults>
         </SearchWrapper>
       </Section>
@@ -323,7 +365,7 @@ const AddAppointment = ({ image }) => {
         <ServicesContainer>
           {services ? (
             services.map(({ label, iconUrl, chosen }) => (
-              <Service key={label} image={iconUrl} chosen={chosen} />
+              <Service key={label} data-label={label} image={iconUrl} chosen={chosen} />
             ))
           ) : (
             <p>No services yet</p>
@@ -347,14 +389,6 @@ const AddAppointment = ({ image }) => {
       </ButtonsContainer>
     </Wrapper>
   );
-};
-
-AddAppointment.propTypes = {
-  image: propTypes.string,
-};
-
-AddAppointment.defaultProps = {
-  image: null,
 };
 
 export default AddAppointment;
