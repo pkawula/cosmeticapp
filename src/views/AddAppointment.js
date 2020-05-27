@@ -6,6 +6,8 @@ import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import { ReactComponent as PersonIcon } from 'images/person.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
+import { Link } from 'react-router-dom';
+import { routes } from 'routes';
 
 const Wrapper = styled.div`
   display: block;
@@ -87,8 +89,8 @@ const SearchResults = styled.ul`
 
   transition: max-height 0.3s ease-in-out;
 
-  ${({ isEmpty, enterred }) =>
-    isEmpty || enterred
+  ${({ isEmpty, focused }) =>
+    isEmpty || focused
       ? css`
           max-height: 200px;
         `
@@ -141,10 +143,6 @@ const PersonName = styled.span`
   font-size: ${({ theme }) => theme.fontSize.m};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   color: ${({ theme }) => theme.black};
-`;
-
-const StyledButton = styled(Button)`
-  display: block;
 `;
 
 const ServicesContainer = styled.div`
@@ -226,6 +224,42 @@ const Service = styled.button`
   }
 `;
 
+const ChosenServicesContainer = styled.div`
+  display: block;
+  width: 100%;
+`;
+
+const ChosenService = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: fit-content;
+  margin: 1em 0.5em;
+  padding: 0.5em 1em;
+  box-shadow: 2px 2px 10px -1px hsla(0, 0%, 0%, 0.2);
+  border-radius: 0.5em;
+`;
+
+const ChosenServiceImage = styled.img`
+  display: block;
+  width: 3em;
+  height: 3em;
+  border-radius: 50%;
+  background: transparent;
+  margin-right: 0.5em;
+  object-position: center center;
+`;
+
+const ChosenServiceLabel = styled.span`
+  display: block;
+  font-size: ${({ theme }) => theme.fontSize.s};
+  font-weight: ${({ theme }) => theme.fontWeight.normal};
+  color: ${({ theme }) => theme.black};
+  margin-left: 0.5em;
+  text-align: left;
+  text-transform: capitalize;
+`;
+
 const DateContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -279,6 +313,15 @@ const ButtonsContainer = styled.div`
   margin: 2em auto;
 `;
 
+const StyledError = styled.p`
+  display: block;
+  font-size: ${({ theme }) => theme.fontSize.l};
+  font-weight: ${({ theme }) => theme.fontWeight.bolder};
+  color: ${({ theme }) => theme.cancel};
+  text-align: left;
+  text-transform: uppercase;
+`;
+
 const AddAppointment = () => {
   const { clients } = useContext(ClientsContext);
   const [inputValue, setInputValue] = useState('');
@@ -317,7 +360,14 @@ const AddAppointment = () => {
     setAllServices();
   }, []);
 
-  const handleUserInput = e => setInputValue(e.target.value);
+  const handleUserInput = e => {
+    const { value } = e.target;
+    setInputValue(value);
+  };
+
+  const handleUserChoose = serviceLabel => {
+    services.find(({ label }) => label === serviceLabel).chosen = true;
+  };
 
   const handleSearch = (object, phrase) => {
     const keys = ['name', 'phone', 'email'];
@@ -343,12 +393,18 @@ const AddAppointment = () => {
             onBlur={() => setFocus(false)}
           />
           <StyledMagnifierIcon />
-          <SearchResults isEmpty={focused || inputValue !== ''}>
+          <SearchResults isEmpty={focused}>
             {clients &&
               clients
                 .filter(client => handleSearch(client, inputValue))
                 .map(({ name, image, clientID }) => (
-                  <Result key={clientID}>
+                  <Result
+                    key={clientID}
+                    onClick={() => {
+                      setInputValue(name);
+                      setFocus(false);
+                    }}
+                  >
                     {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
                     <PersonName>{name}</PersonName>
                   </Result>
@@ -358,19 +414,47 @@ const AddAppointment = () => {
       </Section>
       <Section>
         <SectionTitle>or add new one</SectionTitle>
-        <StyledButton>Add new client</StyledButton>
+        <Button to={routes.addClient} as={Link} style={{ display: 'block', width: 'fit-content' }}>
+          Add new client
+        </Button>
       </Section>
       <Section>
         <SectionTitle>choose a service</SectionTitle>
         <ServicesContainer>
           {services ? (
-            services.map(({ label, iconUrl, chosen }) => (
-              <Service key={label} data-label={label} image={iconUrl} chosen={chosen} />
-            ))
+            services
+              .filter(({ chosen }) => !chosen)
+              .map(({ label, iconUrl }) => (
+                <Service
+                  key={label}
+                  data-label={label}
+                  image={iconUrl}
+                  onClick={() => handleUserChoose(label)}
+                />
+              ))
           ) : (
-            <p>No services yet</p>
+            <StyledError>No services yet</StyledError>
           )}
         </ServicesContainer>
+        {services.filter(service => {
+          if (service.chosen === true) {
+            return (
+              <ChosenServicesContainer>
+                <SectionTitle>Chosen services</SectionTitle>
+                {services
+                  .filter(({ chosen }) => chosen)
+                  .map(({ label, iconUrl }) => (
+                    <ChosenService key={label}>
+                      <ChosenServiceImage src={iconUrl} />
+                      <ChosenServiceLabel>{label}</ChosenServiceLabel>
+                    </ChosenService>
+                  ))}
+              </ChosenServicesContainer>
+            );
+          }
+
+          return null;
+        })}
       </Section>
       <Section>
         <SectionTitle>select date</SectionTitle>
@@ -384,7 +468,9 @@ const AddAppointment = () => {
         </DateContainer>
       </Section>
       <ButtonsContainer>
-        <Button cancel>Cancel</Button>
+        <Button as={Link} to={routes.home} cancel>
+          Cancel
+        </Button>
         <Button>Save</Button>
       </ButtonsContainer>
     </Wrapper>
