@@ -4,10 +4,12 @@ import { ClientsContext } from 'contexts/Clients';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import { ReactComponent as PersonIcon } from 'images/person.svg';
+import DeleteIcon from 'images/icons/delete_icon.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
+import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 
 const Wrapper = styled.div`
   display: block;
@@ -198,7 +200,7 @@ const Service = styled.button`
     background: hsla(0, 0%, 0%, 0.3);
     border-radius: 0.3em;
     position: absolute;
-    top: calc(-2em - 10px);
+    top: -3em;
     left: 50%;
     transform: translateX(-50%) scale(0);
     transform-origin: bottom center;
@@ -209,10 +211,10 @@ const Service = styled.button`
   &::after {
     content: '';
     position: absolute;
-    top: calc(22px - 2em);
+    top: -0.73em;
     left: 50%;
-    border: 10px solid transparent;
-    border-top: 10px solid hsla(0, 0%, 0%, 0.3);
+    border: 0.5em solid transparent;
+    border-top-color: hsla(0, 0%, 0%, 0.3);
     transform: translateX(-50%) scale(0);
     transform-origin: center;
     transition: transform 0.3s ease-in-out;
@@ -224,20 +226,61 @@ const Service = styled.button`
   }
 `;
 
-const ChosenServicesContainer = styled.div`
+const ChosenServicesWrapper = styled.div`
   display: block;
+  width: 100%;
+  animation: slideInBottom 0.2s ease-in-out 1;
+
+  @keyframes slideInBottom {
+    from {
+      transform: translateX(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+`;
+
+const ChosenServicesContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
   width: 100%;
 `;
 
 const ChosenService = styled.div`
-  display: flex;
+  display: inline-flex;
   justify-content: flex-start;
   align-items: center;
   width: fit-content;
   margin: 1em 0.5em;
-  padding: 0.5em 1em;
+  padding: 0.5em 3em 0.5em 1em;
   box-shadow: 2px 2px 10px -1px hsla(0, 0%, 0%, 0.2);
   border-radius: 0.5em;
+  position: relative;
+  animation: slideInBottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1;
+
+  @keyframes slideInBottom {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+`;
+
+const DeselectService = styled(ButtonIcon)`
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 `;
 
 const ChosenServiceImage = styled.img`
@@ -248,6 +291,7 @@ const ChosenServiceImage = styled.img`
   background: transparent;
   margin-right: 0.5em;
   object-position: center center;
+  object-fit: 80%;
 `;
 
 const ChosenServiceLabel = styled.span`
@@ -320,12 +364,14 @@ const StyledError = styled.p`
   color: ${({ theme }) => theme.cancel};
   text-align: left;
   text-transform: uppercase;
+  margin: 0;
 `;
 
 const AddAppointment = () => {
   const { clients } = useContext(ClientsContext);
   const [inputValue, setInputValue] = useState('');
   const [services, setServices] = useState([]);
+  const [chosenServices, chooseService] = useState([]);
   const [focused, setFocus] = useState(false);
 
   const setAllServices = () => {
@@ -348,7 +394,11 @@ const AddAppointment = () => {
     };
 
     const allData = getAllServices().map(service =>
-      service.iconUrl.then(url => ({ label: service.label, iconUrl: url, chosen: false })),
+      service.iconUrl.then(url => ({
+        label: service.label.replace('_', ' '),
+        iconUrl: url,
+        chosen: false,
+      })),
     );
     const formattedData = Promise.all(allData)
       .then(data => setServices(data))
@@ -366,7 +416,25 @@ const AddAppointment = () => {
   };
 
   const handleUserChoose = serviceLabel => {
-    services.find(({ label }) => label === serviceLabel).chosen = true;
+    services.map(({ label, iconUrl }) => {
+      if (label === serviceLabel) {
+        const updatedServices = services.filter(service => service.label !== serviceLabel);
+        setServices(updatedServices);
+        return chooseService([...chosenServices, { label, iconUrl, chosen: true }]);
+      }
+      return null;
+    });
+  };
+
+  const deselectService = serviceLabel => {
+    chosenServices.map(({ label, iconUrl }) => {
+      if (label === serviceLabel) {
+        const selected = chosenServices.filter(service => service.label !== serviceLabel);
+        chooseService(selected);
+        return setServices([...services, { label, iconUrl, chosen: false }]);
+      }
+      return null;
+    });
   };
 
   const handleSearch = (object, phrase) => {
@@ -421,7 +489,7 @@ const AddAppointment = () => {
       <Section>
         <SectionTitle>choose a service</SectionTitle>
         <ServicesContainer>
-          {services ? (
+          {services.length > 0 ? (
             services
               .filter(({ chosen }) => !chosen)
               .map(({ label, iconUrl }) => (
@@ -433,28 +501,24 @@ const AddAppointment = () => {
                 />
               ))
           ) : (
-            <StyledError>No services yet</StyledError>
+            <StyledError>No services</StyledError>
           )}
         </ServicesContainer>
-        {services.filter(service => {
-          if (service.chosen === true) {
-            return (
-              <ChosenServicesContainer>
-                <SectionTitle>Chosen services</SectionTitle>
-                {services
-                  .filter(({ chosen }) => chosen)
-                  .map(({ label, iconUrl }) => (
-                    <ChosenService key={label}>
-                      <ChosenServiceImage src={iconUrl} />
-                      <ChosenServiceLabel>{label}</ChosenServiceLabel>
-                    </ChosenService>
-                  ))}
-              </ChosenServicesContainer>
-            );
-          }
-
-          return null;
-        })}
+        {chosenServices.length > 0 && (
+          <ChosenServicesWrapper>
+            <SectionTitle>Chosen services</SectionTitle>
+            <ChosenServicesContainer>
+              {/* you have to set up a delete option to chosenService component */}
+              {chosenServices.map(({ label, iconUrl }) => (
+                <ChosenService key={label}>
+                  <DeselectService src={DeleteIcon} onClick={() => deselectService(label)} />
+                  <ChosenServiceImage src={iconUrl} />
+                  <ChosenServiceLabel>{label}</ChosenServiceLabel>
+                </ChosenService>
+              ))}
+            </ChosenServicesContainer>
+          </ChosenServicesWrapper>
+        )}
       </Section>
       <Section>
         <SectionTitle>select date</SectionTitle>
@@ -468,7 +532,7 @@ const AddAppointment = () => {
         </DateContainer>
       </Section>
       <ButtonsContainer>
-        <Button as={Link} to={routes.home} cancel>
+        <Button as={Link} to={routes.home} cancel="true">
           Cancel
         </Button>
         <Button>Save</Button>
