@@ -10,6 +10,7 @@ import Button from 'components/atoms/Button/Button';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
+import CalendarModal from 'components/organisms/Calendar/CalendarModal';
 
 const Wrapper = styled.div`
   display: block;
@@ -311,15 +312,18 @@ const DateContainer = styled.div`
   padding: 0.5em 1em;
   width: 100%;
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
+  position: relative;
 `;
 
-const Date = styled.p`
+const DateInfo = styled.p`
   display: block;
   margin: 0;
   padding: 0;
   font-size: ${({ theme }) => theme.fontSize.m};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   color: ${({ theme }) => theme.black};
+  text-transform: capitalize;
+  cursor: pointer;
 `;
 
 const TimeContainer = styled.div`
@@ -338,6 +342,7 @@ const TimeButton = styled.button`
   border: none;
   margin: 0;
   padding: 0 0.5em;
+  cursor: pointer;
 `;
 
 const Time = styled.p`
@@ -365,6 +370,14 @@ const StyledError = styled.p`
   text-align: left;
   text-transform: uppercase;
   margin: 0;
+`;
+
+const ModalContainer = styled.div`
+  display: block;
+  max-width: 90%;
+  position: absolute;
+  top: 0;
+  left: 0;
 `;
 
 const AddAppointment = () => {
@@ -444,6 +457,94 @@ const AddAppointment = () => {
       return object[key].toLowerCase().includes(phrase.toLowerCase());
     });
   };
+  // const getStartDayOfMonth = currentDate => {
+  //   return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+  // };
+
+  // const getEndDayOfMonth = currentDate => {
+  //   return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDay();
+  // };
+
+  // const getDaysOfMonth = currentMonth => {
+  //   return new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+  // };
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const weekDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+  const today = new Date();
+  const [hours, setHours] = useState(today.getHours());
+  const [minutes, setMinutes] = useState(today.getMinutes());
+  const [date, setDate] = useState(today);
+  const [weekDay, setWeekDay] = useState(today.getDay());
+  const [day, setDay] = useState(today.getDate());
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+  // const [startDay, setStartDay] = useState(getStartDayOfMonth(date));
+  // const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
+  // const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
+  const [modalOpened, setModal] = useState(false);
+
+  const displayRoundetTime = (currentHour, currentMinute) => {
+    const checkedHour = currentMinute < 0 ? currentHour - 1 : currentHour;
+    const checkedMinute = currentMinute < 0 ? 45 : currentMinute;
+
+    const minute = (parseInt((checkedMinute + 7.5) / 15, 10) * 15) % 60;
+    const hour = (parseInt(currentMinute / 105 + 0.5, 10) + checkedHour) % 24;
+    setMinutes(minute);
+    setHours(hour);
+  };
+
+  const changeTime = direction => {
+    switch (direction) {
+      case 'DOWN':
+        displayRoundetTime(hours, minutes - 15);
+        break;
+      case 'UP':
+        displayRoundetTime(hours, minutes + 15);
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    displayRoundetTime(date.getHours(), date.getMinutes());
+    setWeekDay(date.getDay());
+    setDay(date.getDate());
+    setMonth(date.getMonth());
+    setYear(date.getFullYear());
+    // setStartDay(getStartDayOfMonth(date));
+    // setEndDay(getEndDayOfMonth(date));
+    // setDaysInMonth(getDaysOfMonth(date));
+  }, [date]);
+
+  const toggleModal = () => setModal(!modalOpened);
+
+  const displayFormattedDay = dayNumber => {
+    if (dayNumber === 1) return `${dayNumber}st`;
+    if (dayNumber === 2) return `${dayNumber}nd`;
+    if (dayNumber === 3) return `${dayNumber}rd`;
+    if (dayNumber === 21) return `${dayNumber}st`;
+    if (dayNumber === 22) return `${dayNumber}nd`;
+    if (dayNumber === 23) return `${dayNumber}rd`;
+    if (dayNumber === 31) return `${dayNumber}st`;
+    return `${dayNumber}th`;
+  };
 
   return (
     <Wrapper>
@@ -508,7 +609,6 @@ const AddAppointment = () => {
           <ChosenServicesWrapper>
             <SectionTitle>Chosen services</SectionTitle>
             <ChosenServicesContainer>
-              {/* you have to set up a delete option to chosenService component */}
               {chosenServices.map(({ label, iconUrl }) => (
                 <ChosenService key={label}>
                   <DeselectService src={DeleteIcon} onClick={() => deselectService(label)} />
@@ -523,11 +623,27 @@ const AddAppointment = () => {
       <Section>
         <SectionTitle>select date</SectionTitle>
         <DateContainer>
-          <Date>Wed, 20th May 2020</Date>
+          <DateInfo onClick={() => toggleModal()}>
+            {weekDays[weekDay]}, {displayFormattedDay(day)} {months[month]} {year}
+            {modalOpened && (
+              <ModalContainer>
+                <CalendarModal
+                  months={months}
+                  currentMonth={month}
+                  currentYear={year}
+                  toggleModal={() => toggleModal()}
+                  toggleMonth={toMonth => setDate(new Date(year, toMonth, day))}
+                  setYear={toYear => setDate(new Date(toYear, month, day))}
+                />
+              </ModalContainer>
+            )}
+          </DateInfo>
           <TimeContainer>
-            <TimeButton>-</TimeButton>
-            <Time>21:30</Time>
-            <TimeButton>+</TimeButton>
+            <TimeButton onClick={() => changeTime('DOWN')}>-</TimeButton>
+            <Time>
+              {hours}:{minutes === 0 ? '00' : minutes}
+            </Time>
+            <TimeButton onClick={() => changeTime('UP')}>+</TimeButton>
           </TimeContainer>
         </DateContainer>
       </Section>
