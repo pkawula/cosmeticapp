@@ -109,6 +109,30 @@ const StyledListItem = styled.li`
   position: relative;
   margin: 0.5em 0;
 
+  &:hover::after {
+    transform: scale(1) translateY(-50%);
+    opacity: 1;
+  }
+
+  &::after {
+    content: attr(data-tooltip);
+    font-size: ${({ theme }) => theme.fontSize.xxs};
+    font-weight: ${({ theme }) => theme.fontWeight.bold};
+    color: ${({ theme }) => theme.light};
+    text-transform: uppercase;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    background: hsla(0, 0%, 0%, 0.6);
+    border-radius: 0.5em;
+    padding: 0.5em;
+    opacity: 0;
+    transform: scale(0) translateY(-50%);
+    transform-origin: top right;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2), opacity linear 0.1s;
+  }
+
   &::before {
     content: '';
     width: ${({ theme }) => theme.fontSize.m};
@@ -165,19 +189,21 @@ const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
       <StyledBottomContainer>
         <StyledList>
           <StyledListHeading>Contact info</StyledListHeading>
-          <StyledListItem src={PhoneIcon}>
+          <StyledListItem src={PhoneIcon} data-tooltip="Phone number">
             <Link href={`tel:${phone}`}>{phone}</Link>
           </StyledListItem>
-          <StyledListItem src={MailIcon}>
+          <StyledListItem src={MailIcon} data-tooltip="email address">
             <Link href={`mailto:${email}`}>{email}</Link>
           </StyledListItem>
         </StyledList>
         <StyledList>
           <StyledListHeading>Visit info</StyledListHeading>
-          <StyledListItem src={LipstickIcon} bold>
+          <StyledListItem src={LipstickIcon} bold data-tooltip="All Visits">
             23
           </StyledListItem>
-          <StyledListItem src={VisitIcon}>tuesday, 27th june, 7 a.m.</StyledListItem>
+          <StyledListItem src={VisitIcon} data-tooltip="Next visit">
+            tuesday, 27th june, 7 a.m.
+          </StyledListItem>
         </StyledList>
       </StyledBottomContainer>
       {modalOpened && (
