@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import propTypes from 'prop-types';
 import ProfilePicture from 'images/person.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
@@ -108,7 +109,7 @@ const ErrorMessage = styled.span`
   border-radius: 0.5em;
 `;
 
-const AddClient = () => {
+const AddClient = ({ history }) => {
   const { dispatch } = useContext(ClientsContext);
   const [client, setClient] = useState('');
   const [error, setError] = useState('');
@@ -153,6 +154,11 @@ const AddClient = () => {
     }
   };
 
+  const cancel = e => {
+    e.preventDefault();
+    history.goBack();
+  };
+
   return (
     <StyledWrapper>
       <StyledLabelContainer>
@@ -193,7 +199,7 @@ const AddClient = () => {
           value={client.email ? client.email : ''}
         />
         <StyledSubmittingContainer>
-          <Button as={Link} cancel="true" to={routes.home}>
+          <Button cancel="true" onClick={e => cancel(e)}>
             Cancel
           </Button>
           <Button disabled={!buttonActive} type="submit" onClick={e => handleSubmit(e)}>
@@ -209,6 +215,14 @@ const AddClient = () => {
       </ErrorContainer>
     </StyledWrapper>
   );
+};
+
+AddClient.propTypes = {
+  history: propTypes.objectOf(propTypes.object),
+};
+
+AddClient.defaultProps = {
+  history: null,
 };
 
 export default AddClient;

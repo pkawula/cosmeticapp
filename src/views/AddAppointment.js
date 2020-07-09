@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import styled, { css } from 'styled-components';
+import propTypes from 'prop-types';
 import { ClientsContext } from 'contexts/Clients';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
@@ -341,15 +342,20 @@ const TimeButton = styled.button`
   background: transparent;
   border: none;
   margin: 0;
-  padding: 0 0.5em;
+  padding: 0 0.25em;
   cursor: pointer;
 `;
 
-const Time = styled.p`
-  display: block;
+const TimeField = styled.input`
+  display: inline-block;
+  width: fit-content;
+  max-width: 3em;
   font-size: ${({ theme }) => theme.fontSize.m};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   color: ${({ theme }) => theme.black};
+  background: ${({ theme }) => theme.light};
+  border: none;
+  box-shadow: none;
   text-align: center;
   margin: 0;
   padding: 0;
@@ -380,12 +386,59 @@ const ModalContainer = styled.div`
   left: 0;
 `;
 
-const AddAppointment = () => {
+const ErrorContainer = styled.div`
+  position: fixed;
+  top: 1em;
+  right: 1em;
+  width: fit-content;
+  max-width: 250px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+`;
+
+const Error = styled.p`
+  display: block;
+  background: hsla(356.9, 86.8%, 52.1%, 0.8);
+  margin: 0.5em auto;
+  font-size: ${({ theme }) => theme.fontSize.xs};
+  color: ${({ theme }) => theme.light};
+  border-radius: 0.5em;
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  text-transform: uppercase;
+  padding: 0.5em;
+`;
+
+const AddAppointment = ({ history: { goBack } }) => {
   const { clients } = useContext(ClientsContext);
   const [inputValue, setInputValue] = useState('');
   const [services, setServices] = useState([]);
   const [chosenServices, chooseService] = useState([]);
   const [focused, setFocus] = useState(false);
+  const [errors, setError] = useState([]);
+  const [inputtedTime, setInputtedTime] = useState('');
+  const [isEditing, setEdit] = useState(false);
+
+  const today = new Date();
+  const [hours, setHours] = useState(today.getHours());
+  const [minutes, setMinutes] = useState(today.getMinutes());
+  const [date, setDate] = useState(today);
+  const [weekDay, setWeekDay] = useState(today.getDay());
+  const [day, setDay] = useState(today.getDate());
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+  const [modalOpened, setModal] = useState(false);
+
+  const newError = errs => {
+    const check = errors.map(e => errs.forEach(er => er.includes(e)));
+    if (check.length) return;
+
+    if (errors.find(e => e === errs.map(er => er))) return;
+    setError([...errors, ...errs]);
+    setTimeout(() => setError([]), 8000);
+  };
 
   const setAllServices = () => {
     const getAllServices = () => {
@@ -457,17 +510,27 @@ const AddAppointment = () => {
       return object[key].toLowerCase().includes(phrase.toLowerCase());
     });
   };
-  // const getStartDayOfMonth = currentDate => {
-  //   return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-  // };
 
-  // const getEndDayOfMonth = currentDate => {
-  //   return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDay();
-  // };
+  const saveAppointment = (pickedServices, clientInfo, visitDate, status = 'planned') => {
+    const errs = [];
 
-  // const getDaysOfMonth = currentMonth => {
-  //   return new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
-  // };
+    if (clientInfo === '') errs.push('Who will be your client?');
+    if (!pickedServices.length) errs.push('What you want to do with your client, huh?');
+
+    if (!visitDate < today)
+      errs.push(
+        "There's not time machine, isn't it? Change visit time to the future, not the past :)",
+      );
+
+    if (errs.length) return newError([...errs]);
+
+    return {
+      pickedServices,
+      clientInfo,
+      visitDate,
+      status,
+    };
+  };
 
   const months = [
     'January',
@@ -486,19 +549,6 @@ const AddAppointment = () => {
 
   const weekDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-  const today = new Date();
-  const [hours, setHours] = useState(today.getHours());
-  const [minutes, setMinutes] = useState(today.getMinutes());
-  const [date, setDate] = useState(today);
-  const [weekDay, setWeekDay] = useState(today.getDay());
-  const [day, setDay] = useState(today.getDate());
-  const [month, setMonth] = useState(today.getMonth());
-  const [year, setYear] = useState(today.getFullYear());
-  // const [startDay, setStartDay] = useState(getStartDayOfMonth(date));
-  // const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
-  // const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
-  const [modalOpened, setModal] = useState(false);
-
   const displayRoundetTime = (currentHour, currentMinute) => {
     const checkedHour = currentMinute < 0 ? currentHour - 1 : currentHour;
     const checkedMinute = currentMinute < 0 ? 45 : currentMinute;
@@ -512,25 +562,33 @@ const AddAppointment = () => {
   const changeTime = direction => {
     switch (direction) {
       case 'DOWN':
-        displayRoundetTime(hours, minutes - 15);
+        setDate(new Date(year, month, day, hours, minutes - 15));
         break;
       case 'UP':
-        displayRoundetTime(hours, minutes + 15);
+        setDate(new Date(year, month, day, hours, minutes + 15));
         break;
       default:
         break;
     }
   };
 
+  const handleUserTimeInput = e => {
+    const { value } = e.target;
+    setInputtedTime(value);
+  };
+
+  const roundTimeOnBlur = value => {
+    if (!value.includes(':')) return;
+    const time = value.split(':');
+    setDate(new Date(year, month, day, time[0], time[1]));
+  };
+
   useEffect(() => {
-    displayRoundetTime(date.getHours(), date.getMinutes());
+    setMinutes(() => displayRoundetTime(date.getHours(), date.getMinutes()));
     setWeekDay(date.getDay());
     setDay(date.getDate());
     setMonth(date.getMonth());
     setYear(date.getFullYear());
-    // setStartDay(getStartDayOfMonth(date));
-    // setEndDay(getEndDayOfMonth(date));
-    // setDaysInMonth(getDaysOfMonth(date));
   }, [date]);
 
   const toggleModal = () => setModal(!modalOpened);
@@ -640,21 +698,41 @@ const AddAppointment = () => {
           </DateInfo>
           <TimeContainer>
             <TimeButton onClick={() => changeTime('DOWN')}>-</TimeButton>
-            <Time>
-              {hours}:{minutes === 0 ? '00' : minutes}
-            </Time>
+            <TimeField
+              type="text"
+              onBlur={() => {
+                roundTimeOnBlur(inputtedTime);
+                setEdit(!isEditing);
+              }}
+              onFocus={e => {
+                handleUserTimeInput(e);
+                setEdit(!isEditing);
+              }}
+              onChange={e => handleUserTimeInput(e)}
+              value={isEditing ? inputtedTime : `${hours}:${minutes === 0 ? '00' : minutes}`}
+            />
             <TimeButton onClick={() => changeTime('UP')}>+</TimeButton>
           </TimeContainer>
         </DateContainer>
       </Section>
       <ButtonsContainer>
-        <Button as={Link} to={routes.home} cancel="true">
+        <Button onClick={() => goBack()} cancel="true">
           Cancel
         </Button>
-        <Button>Save</Button>
+        <Button onClick={() => saveAppointment(chosenServices, inputValue, date)}>Save</Button>
       </ButtonsContainer>
+      <ErrorContainer>
+        {errors.length > 0 && errors.map(err => <Error key={err}>{err}</Error>)}
+      </ErrorContainer>
     </Wrapper>
   );
+};
+
+AddAppointment.propTypes = {
+  history: propTypes.shape({
+    goBack: propTypes.func.isRequired,
+    length: propTypes.number.isRequired,
+  }).isRequired,
 };
 
 export default AddAppointment;
