@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
-import CalendarModal from './CalendarModal';
 
 const StyledWrapper = styled.div`
   display: block;
@@ -164,13 +163,28 @@ const StyledDay = styled.li`
     `}; */
 `;
 
-const StyledModal = styled.div`
+const StyledItem = styled.li`
+  flex-basis: 30%;
   display: block;
-  width: auto;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 0.5em;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  text-align: center;
+  background: ${({ today }) => (today ? 'hsl(263, 45%, 56%)' : 'hsl(0, 0%, 94%)')};
+  color: ${({ theme, today }) => (today ? theme.light : theme.black)};
+  box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
+  cursor: pointer;
+`;
+
+const StyledInnerWrapper = styled.ul`
+  width: 100%;
+  padding: 1em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  list-style: none;
+  margin: 0;
 `;
 
 const Calendar = () => {
@@ -203,6 +217,8 @@ const Calendar = () => {
 
   const weekDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
+  const calendarTypes = ['days', 'months', 'years'];
+
   const today = new Date();
   const [date, setDate] = useState(today);
   const [day, setDay] = useState(today.getDate());
@@ -211,7 +227,7 @@ const Calendar = () => {
   const [startDay, setStartDay] = useState(getStartDayOfMonth(date));
   const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
   const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
-  const [modalOpened, setModal] = useState(false);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     setDay(date.getDate());
@@ -222,57 +238,107 @@ const Calendar = () => {
     setDaysInMonth(getDaysOfMonth(date));
   }, [date]);
 
-  const toggleModal = () => setModal(!modalOpened);
+  const countClick = action => {
+    if (count > 2) return setCount(2);
+    if (count < 0) return setCount(0);
+    if (action === 'increment') {
+      if (count === 2) return setCount(2);
+      setCount(count + 1);
+    }
+    if (action === 'decrement') {
+      if (count === 0) return setCount(0);
+      setCount(count - 1);
+    }
+    return new Error('You have to define action!');
+  };
+
+  const chosenType = type => {
+    if (type === 0) return Array(daysInMonth + (startDay - 1) + (7 - endDay)).fill(null);
+    if (type === 2) return Array(10).fill(null);
+    return months;
+  };
+
+  const handleArrowDateChange = (dir, clicksCount) => {
+    const decYear = calendarTypes[clicksCount] === 'years' ? year - 10 : year;
+    const decMonth = calendarTypes[clicksCount] !== 'years' ? month - 1 : month;
+    const incYear = calendarTypes[clicksCount] === 'years' ? year + 10 : year;
+    const incMonth = calendarTypes[clicksCount] !== 'years' ? month + 1 : month;
+
+    if (dir === 'decrement') return setDate(new Date(decYear, decMonth, day));
+    if (dir === 'increment') return setDate(new Date(incYear, incMonth, day));
+
+    return new Error('Please check if all arguments were given');
+  };
 
   return (
     <StyledWrapper>
       <StyledNavigationContainer>
-        <StyledButtonIcon onClick={() => setDate(new Date(year, month - 1, day))} left="true">
+        <StyledButtonIcon onClick={() => handleArrowDateChange('decrement', count)} left="true">
           <ArrowImage />
         </StyledButtonIcon>
-        <StyledDateInfo onClick={() => toggleModal()}>
+        <StyledDateInfo onClick={() => countClick('increment')}>
           <StyledYear>{year}</StyledYear>
           <StyledMonthName>{months[month]}</StyledMonthName>
         </StyledDateInfo>
-        <StyledButtonIcon onClick={() => setDate(new Date(year, month + 1, day))}>
+        <StyledButtonIcon onClick={() => handleArrowDateChange('increment', count)}>
           <ArrowImage />
         </StyledButtonIcon>
       </StyledNavigationContainer>
-      <StyledCalendarContainer modalOpened={modalOpened}>
-        <StyledWeekNamesContainer>
-          {weekDays.map(weekDay => (
-            <StyledWeekName key={weekDay}>{weekDay}</StyledWeekName>
-          ))}
-        </StyledWeekNamesContainer>
-        <StyledMonthDaysContainer>
-          {Array(daysInMonth + (startDay - 1) + (7 - endDay))
-            .fill(null)
-            .map((_, index) => {
-              const d = index - (startDay - 2);
+      {calendarTypes[count] === 'days' ? (
+        <StyledCalendarContainer>
+          <StyledWeekNamesContainer>
+            {weekDays.map(weekDay => (
+              <StyledWeekName key={weekDay}>{weekDay}</StyledWeekName>
+            ))}
+          </StyledWeekNamesContainer>
+          <StyledMonthDaysContainer>
+            {chosenType(0).map((name, index) => {
+              const currentDay = index - (startDay - 2);
 
               return (
                 <StyledDay
-                  key={d}
-                  today={d === today.getDate()}
-                  elseMonth={d <= 0 || d > daysInMonth}
+                  key={currentDay}
+                  today={currentDay === today.getDate()}
+                  elseMonth={currentDay <= 0 || currentDay > daysInMonth}
                 >
-                  {d <= 0 || d > daysInMonth ? new Date(year, month, d).getDate() : d}
+                  {currentDay <= 0 || currentDay > daysInMonth
+                    ? new Date(year, month, currentDay).getDate()
+                    : currentDay}
                 </StyledDay>
               );
             })}
-        </StyledMonthDaysContainer>
-      </StyledCalendarContainer>
-      {modalOpened && (
-        <StyledModal>
-          <CalendarModal
-            months={months}
-            currentMonth={month}
-            currentYear={year}
-            toggleModal={() => toggleModal()}
-            toggleMonth={toMonth => setDate(new Date(year, toMonth, day))}
-            setYear={toYear => setDate(new Date(toYear, month, day))}
-          />
-        </StyledModal>
+          </StyledMonthDaysContainer>
+        </StyledCalendarContainer>
+      ) : (
+        <StyledInnerWrapper>
+          {chosenType(count).map((_, index) => {
+            const itemToDisplay = () => {
+              if (calendarTypes[count] === 'months') return months[index];
+              return year + index;
+            };
+
+            return (
+              <StyledItem
+                key={itemToDisplay() === year + index ? itemToDisplay() : months[index]}
+                today={
+                  itemToDisplay() === year + index
+                    ? itemToDisplay() === year
+                    : itemToDisplay() === months[month]
+                }
+                onClick={() => {
+                  setDate(
+                    itemToDisplay() === year + index
+                      ? new Date(itemToDisplay(), month, day)
+                      : new Date(year, index, day),
+                  );
+                  countClick('decrement');
+                }}
+              >
+                {itemToDisplay() === year + index ? itemToDisplay() : months[index]}
+              </StyledItem>
+            );
+          })}
+        </StyledInnerWrapper>
       )}
     </StyledWrapper>
   );
