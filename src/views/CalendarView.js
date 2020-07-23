@@ -6,7 +6,7 @@ import Event from 'components/molecules/Event/Event';
 
 const StyledWrapper = styled.section`
   width: 100%;
-  margin-top: 2em;
+  padding: 0 0.5em;
 `;
 
 const StyledSectionTitle = styled.h3`

@@ -7,6 +7,7 @@ import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 const StyledWrapper = styled.div`
   display: block;
   padding: 0;
+  margin: 0 auto;
   width: 100%;
   max-width: 436px;
   min-width: 320px;
@@ -239,7 +240,7 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
     setDay(date.getDate());
     setMonth(date.getMonth());
     setYear(date.getFullYear());
-    changeModalDate(date);
+    // optDate && changeModalDate(date);
     setStartDay(getStartDayOfMonth(date));
     setEndDay(getEndDayOfMonth(date));
     setDaysInMonth(getDaysOfMonth(date));
@@ -309,7 +310,8 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                   elseMonth={currentDay <= 0 || currentDay > daysInMonth}
                   onClick={() => {
                     setDate(new Date(year, month, currentDay));
-                    setTimeout(() => toggleModal(), 100);
+                    changeModalDate(new Date(year, month, currentDay));
+                    setTimeout(() => toggleModal(), 200);
                   }}
                 >
                   {currentDay <= 0 || currentDay > daysInMonth
@@ -338,6 +340,11 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                 }
                 onClick={() => {
                   setDate(
+                    itemToDisplay() === year + index
+                      ? new Date(itemToDisplay(), month, day)
+                      : new Date(year, index, day),
+                  );
+                  changeModalDate(
                     itemToDisplay() === year + index
                       ? new Date(itemToDisplay(), month, day)
                       : new Date(year, index, day),

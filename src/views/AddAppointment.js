@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import { ClientsContext } from 'contexts/Clients';
@@ -426,23 +426,6 @@ const AddAppointment = ({ history: { goBack } }) => {
   const [modalOpened, setModal] = useState(false);
   const toggleModal = () => setModal(!modalOpened);
 
-  const modalRef = useRef(null);
-
-  const useModalRef = ref => {
-    useEffect(() => {
-      const handleClickOutside = e => {
-        if (ref.current && !ref.current.contains(e.target)) {
-          setModal(false);
-        }
-      };
-
-      document.addEventListener('mousedown', e => handleClickOutside(e));
-      return () => document.removeEventListener('mousedown', e => handleClickOutside(e));
-    }, [ref]);
-  };
-
-  useModalRef(modalRef);
-
   const newError = errs => {
     const check = errors.map(e => errs.forEach(er => er.includes(e)));
     if (check.length) return;
@@ -691,7 +674,7 @@ const AddAppointment = ({ history: { goBack } }) => {
       <Section>
         <SectionTitle>select date</SectionTitle>
         <DateContainer>
-          <DateInfo ref={modalRef} onClick={() => setModal(true)}>
+          <DateInfo onClick={() => setModal(true)}>
             {weekDays[weekDay]}, {displayFormattedDay(day)} {months[month]} {year}
           </DateInfo>
           {modalOpened && (
