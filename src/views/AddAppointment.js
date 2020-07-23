@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import { ClientsContext } from 'contexts/Clients';
@@ -11,7 +11,8 @@ import Button from 'components/atoms/Button/Button';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
-import CalendarModal from 'components/organisms/Calendar/CalendarModal';
+import Calendar from 'components/organisms/Calendar/Calendar';
+import Modal from 'components/atoms/Modal/Modal';
 
 const Wrapper = styled.div`
   display: block;
@@ -378,14 +379,6 @@ const StyledError = styled.p`
   margin: 0;
 `;
 
-const ModalContainer = styled.div`
-  display: block;
-  max-width: 90%;
-  position: absolute;
-  top: 0;
-  left: 0;
-`;
-
 const ErrorContainer = styled.div`
   position: fixed;
   top: 1em;
@@ -422,14 +415,33 @@ const AddAppointment = ({ history: { goBack } }) => {
   const [isEditing, setEdit] = useState(false);
 
   const today = new Date();
+  const [date, setDate] = useState(today);
   const [hours, setHours] = useState(today.getHours());
   const [minutes, setMinutes] = useState(today.getMinutes());
-  const [date, setDate] = useState(today);
   const [weekDay, setWeekDay] = useState(today.getDay());
   const [day, setDay] = useState(today.getDate());
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
+
   const [modalOpened, setModal] = useState(false);
+  const toggleModal = () => setModal(!modalOpened);
+
+  const modalRef = useRef(null);
+
+  const useModalRef = ref => {
+    useEffect(() => {
+      const handleClickOutside = e => {
+        if (ref.current && !ref.current.contains(e.target)) {
+          setModal(false);
+        }
+      };
+
+      document.addEventListener('mousedown', e => handleClickOutside(e));
+      return () => document.removeEventListener('mousedown', e => handleClickOutside(e));
+    }, [ref]);
+  };
+
+  useModalRef(modalRef);
 
   const newError = errs => {
     const check = errors.map(e => errs.forEach(er => er.includes(e)));
@@ -591,8 +603,6 @@ const AddAppointment = ({ history: { goBack } }) => {
     setYear(date.getFullYear());
   }, [date]);
 
-  const toggleModal = () => setModal(!modalOpened);
-
   const displayFormattedDay = dayNumber => {
     if (dayNumber === 1) return `${dayNumber}st`;
     if (dayNumber === 2) return `${dayNumber}nd`;
@@ -681,21 +691,14 @@ const AddAppointment = ({ history: { goBack } }) => {
       <Section>
         <SectionTitle>select date</SectionTitle>
         <DateContainer>
-          <DateInfo onClick={() => toggleModal()}>
+          <DateInfo ref={modalRef} onClick={() => setModal(true)}>
             {weekDays[weekDay]}, {displayFormattedDay(day)} {months[month]} {year}
-            {modalOpened && (
-              <ModalContainer>
-                <CalendarModal
-                  months={months}
-                  currentMonth={month}
-                  currentYear={year}
-                  toggleModal={() => toggleModal()}
-                  toggleMonth={toMonth => setDate(new Date(year, toMonth, day))}
-                  setYear={toYear => setDate(new Date(toYear, month, day))}
-                />
-              </ModalContainer>
-            )}
           </DateInfo>
+          {modalOpened && (
+            <Modal toggleModal={toggleModal}>
+              <Calendar optDate={date} changeDate={setDate} toggleModal={toggleModal} />
+            </Modal>
+          )}
           <TimeContainer>
             <TimeButton onClick={() => changeTime('DOWN')}>-</TimeButton>
             <TimeField

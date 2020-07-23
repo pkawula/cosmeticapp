@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import propTypes from 'prop-types';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 
 const StyledWrapper = styled.div`
   display: block;
-  margin: 2em auto;
   padding: 0;
   width: 100%;
   max-width: 436px;
+  min-width: 320px;
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
   position: relative;
+  background: #f0f0f0;
 `;
 
 export const StyledNavigationContainer = styled.div`
@@ -131,6 +133,7 @@ const StyledDay = styled.li`
   opacity: ${({ elseMonth }) => (elseMonth ? 0.5 : 1)};
   box-shadow: 3px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
   position: relative;
+  cursor: pointer;
 
   /*  this will add info about (number of) events on calendar day
   ${({ isReserved }) =>
@@ -166,6 +169,8 @@ const StyledDay = styled.li`
 const StyledItem = styled.li`
   flex-basis: 30%;
   display: block;
+  font-size: ${({ theme }) => theme.fontSize.s};
+  font-weight: ${({ theme }) => theme.fontWeight.normal};
   margin-top: 0.5em;
   padding: 0.5em;
   border-radius: 0.5em;
@@ -187,7 +192,7 @@ const StyledInnerWrapper = styled.ul`
   margin: 0;
 `;
 
-const Calendar = () => {
+const Calendar = ({ optDate, changeDate, toggleModal }) => {
   const getStartDayOfMonth = currentDate => {
     return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
   };
@@ -219,7 +224,7 @@ const Calendar = () => {
 
   const calendarTypes = ['days', 'months', 'years'];
 
-  const today = new Date();
+  const today = optDate || new Date();
   const [date, setDate] = useState(today);
   const [day, setDay] = useState(today.getDate());
   const [month, setMonth] = useState(today.getMonth());
@@ -228,11 +233,13 @@ const Calendar = () => {
   const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
   const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
   const [count, setCount] = useState(0);
+  const changeModalDate = newDate => changeDate(newDate);
 
   useEffect(() => {
     setDay(date.getDate());
     setMonth(date.getMonth());
     setYear(date.getFullYear());
+    changeModalDate(date);
     setStartDay(getStartDayOfMonth(date));
     setEndDay(getEndDayOfMonth(date));
     setDaysInMonth(getDaysOfMonth(date));
@@ -298,8 +305,12 @@ const Calendar = () => {
               return (
                 <StyledDay
                   key={currentDay}
-                  today={currentDay === today.getDate()}
+                  today={currentDay === day}
                   elseMonth={currentDay <= 0 || currentDay > daysInMonth}
+                  onClick={() => {
+                    setDate(new Date(year, month, currentDay));
+                    setTimeout(() => toggleModal(), 100);
+                  }}
                 >
                   {currentDay <= 0 || currentDay > daysInMonth
                     ? new Date(year, month, currentDay).getDate()
@@ -342,6 +353,18 @@ const Calendar = () => {
       )}
     </StyledWrapper>
   );
+};
+
+Calendar.propTypes = {
+  optDate: propTypes.objectOf(propTypes.object),
+  changeDate: propTypes.func,
+  toggleModal: propTypes.func,
+};
+
+Calendar.defaultProps = {
+  optDate: null,
+  changeDate: null,
+  toggleModal: null,
 };
 
 export default Calendar;
