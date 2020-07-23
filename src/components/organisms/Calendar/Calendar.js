@@ -234,13 +234,11 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
   const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
   const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
   const [count, setCount] = useState(0);
-  const changeModalDate = newDate => changeDate(newDate);
 
   useEffect(() => {
     setDay(date.getDate());
     setMonth(date.getMonth());
     setYear(date.getFullYear());
-    // optDate && changeModalDate(date);
     setStartDay(getStartDayOfMonth(date));
     setEndDay(getEndDayOfMonth(date));
     setDaysInMonth(getDaysOfMonth(date));
@@ -310,7 +308,7 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                   elseMonth={currentDay <= 0 || currentDay > daysInMonth}
                   onClick={() => {
                     setDate(new Date(year, month, currentDay));
-                    changeModalDate(new Date(year, month, currentDay));
+                    changeDate(new Date(year, month, currentDay, 8, 0));
                     setTimeout(() => toggleModal(), 200);
                   }}
                 >
@@ -344,10 +342,10 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                       ? new Date(itemToDisplay(), month, day)
                       : new Date(year, index, day),
                   );
-                  changeModalDate(
+                  changeDate(
                     itemToDisplay() === year + index
-                      ? new Date(itemToDisplay(), month, day)
-                      : new Date(year, index, day),
+                      ? new Date(itemToDisplay(), month, day, 8, 0)
+                      : new Date(year, index, day, 8, 0),
                   );
                   countClick('decrement');
                 }}

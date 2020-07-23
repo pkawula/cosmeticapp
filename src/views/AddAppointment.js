@@ -510,9 +510,10 @@ const AddAppointment = ({ history: { goBack } }) => {
     const errs = [];
 
     if (clientInfo === '') errs.push('Who will be your client?');
+
     if (!pickedServices.length) errs.push('What you want to do with your client, huh?');
 
-    if (!visitDate < today)
+    if (visitDate.getTime() < today.getTime())
       errs.push(
         "There's not time machine, isn't it? Change visit time to the future, not the past :)",
       );

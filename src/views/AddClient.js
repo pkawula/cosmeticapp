@@ -109,7 +109,7 @@ const ErrorMessage = styled.span`
   border-radius: 0.5em;
 `;
 
-const AddClient = ({ history }) => {
+const AddClient = ({ history: { goBack } }) => {
   const { dispatch } = useContext(ClientsContext);
   const [client, setClient] = useState('');
   const [error, setError] = useState('');
@@ -156,7 +156,7 @@ const AddClient = ({ history }) => {
 
   const cancel = e => {
     e.preventDefault();
-    history.goBack();
+    goBack();
   };
 
   return (
@@ -218,11 +218,9 @@ const AddClient = ({ history }) => {
 };
 
 AddClient.propTypes = {
-  history: propTypes.objectOf(propTypes.object),
-};
-
-AddClient.defaultProps = {
-  history: null,
+  history: propTypes.shape({
+    goBack: propTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default AddClient;
