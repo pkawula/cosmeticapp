@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useContext } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
+
+import { AppointmentsContext } from 'contexts/Appointments';
 
 const StyledWrapper = styled.div`
   display: block;
@@ -136,9 +138,8 @@ const StyledDay = styled.li`
   position: relative;
   cursor: pointer;
 
-  /*  this will add info about (number of) events on calendar day
   ${({ isReserved }) =>
-    isReserved &&
+    isReserved > 0 &&
     css`
       &::before {
         content: '';
@@ -152,7 +153,7 @@ const StyledDay = styled.li`
       }
 
       &::after {
-        content: '5';
+        content: '${isReserved}';
         width: 1.2em;
         height: 1.2em;
         line-height: 1.2em;
@@ -164,7 +165,7 @@ const StyledDay = styled.li`
         left: -0.2em;
         z-index: 1;
       }
-    `}; */
+    `};
 `;
 
 const StyledItem = styled.li`
@@ -194,6 +195,8 @@ const StyledInnerWrapper = styled.ul`
 `;
 
 const Calendar = ({ optDate, changeDate, toggleModal }) => {
+  const { appointments } = useContext(AppointmentsContext);
+
   const getStartDayOfMonth = currentDate => {
     return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
   };
@@ -276,6 +279,27 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
     return new Error('Please check if all arguments were given');
   };
 
+  const checkIfPlannedVisit = dateToCheck => {
+    const dayToCheck = dateToCheck.getDate();
+    // const monthToCheck = dateToCheck.getMonth();
+
+    return appointments.filter(({ visitDate }) => new Date(visitDate).getDate() === dayToCheck)
+      .length;
+
+    // appointments.reduce((prevVal, curVal) => {
+    //   const prevDay = new Date(prevVal.visitDate).getDate();
+    //   const curDay = new Date(curVal.visitDate).getDate();
+    //   const prevMonth = new Date(prevVal.visitDate).getMonth();
+    //   const curMonth = new Date(curVal.visitDate).getMonth();
+
+    //   console.log((curDay - dayToCheck), (prevDay - dayToCheck), (curMonth - monthToCheck), (prevMonth - monthToCheck))
+
+    //   return ((curDay - dayToCheck) < (prevDay - dayToCheck) && (curMonth - monthToCheck) === (prevMonth - monthToCheck) ? curDay : prevDay);
+    // });
+  };
+
+  // console.log(checkIfPlannedVisit(new Date(2020, 6, 31)))
+
   return (
     <StyledWrapper>
       <StyledNavigationContainer>
@@ -305,6 +329,7 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                 <StyledDay
                   key={currentDay}
                   today={currentDay === day}
+                  isReserved={checkIfPlannedVisit(new Date(year, month, currentDay))}
                   elseMonth={currentDay <= 0 || currentDay > daysInMonth}
                   onClick={() => {
                     setDate(new Date(year, month, currentDay));

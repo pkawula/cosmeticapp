@@ -7,6 +7,7 @@ import { theme } from 'theme/mainTheme';
 import GlobalStyle from 'theme/GlobalStyle';
 import Panel from 'views/Panel';
 import ClientsContextProvider from 'contexts/Clients';
+import AppointmentsContextProvider from 'contexts/Appointments';
 import AddClient from './AddClient';
 import AllClients from './AllClients';
 import CalendarView from './CalendarView';
@@ -19,13 +20,15 @@ const Root = () => (
       <TopBar />
 
       <ClientsContextProvider>
-        <Switch>
-          <Route exact path={routes.home} component={Panel} />
-          <Route path={routes.addClient} component={AddClient} />
-          <Route path={routes.clients} component={AllClients} />
-          <Route path={routes.calendar} component={CalendarView} />
-          <Route path={routes.addAppointment} component={AddAppointment} />
-        </Switch>
+        <AppointmentsContextProvider>
+          <Switch>
+            <Route exact path={routes.home} component={Panel} />
+            <Route path={routes.addClient} component={AddClient} />
+            <Route path={routes.clients} component={AllClients} />
+            <Route path={routes.calendar} component={CalendarView} />
+            <Route path={routes.addAppointment} component={AddAppointment} />
+          </Switch>
+        </AppointmentsContextProvider>
       </ClientsContextProvider>
     </ThemeProvider>
   </BrowserRouter>

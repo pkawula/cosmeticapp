@@ -13,6 +13,7 @@ import VisitIcon from 'images/icons/visit_icon.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Link from 'components/atoms/Link/Link';
 import EditClient from 'components/organisms/EditClient/EditClient';
+import { AppointmentsContext } from 'contexts/Appointments';
 
 const StyledWrapper = styled.main`
   display: block;
@@ -163,8 +164,57 @@ const StyledListHeading = styled.h3`
 
 const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
   const { dispatch } = useContext(ClientsContext);
+  const { appointments } = useContext(AppointmentsContext);
 
   const [modalOpened, setModal] = useState(false);
+
+  const filteredAppointments = appointments.filter(
+    appointment => appointment.clientID === clientID,
+  );
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const weekDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+  const nextVisit = () => {
+    const today = new Date().getTime();
+
+    const convertedTime = filteredAppointments.reduce((prevVal, curVal) => {
+      const prevValue = new Date(prevVal.visitDate).getTime();
+      const curValue = new Date(curVal.visitDate).getTime();
+      return Math.abs(curValue - today) < Math.abs(prevValue - today) ? prevValue : curValue;
+    });
+
+    if (typeof convertedTime === 'object')
+      return `${weekDays[new Date(convertedTime.visitDate).getDay()]}, ${new Date(
+        convertedTime.visitDate,
+      ).getDay()} ${months[new Date(convertedTime.visitDate).getMonth()]} | ${new Date(
+        convertedTime.visitDate,
+      ).getHours()}:${
+        new Date(convertedTime.visitDate).getMinutes() === 0
+          ? '00'
+          : new Date(convertedTime.visitDate).getMinutes()
+      }`;
+
+    return `${weekDays[new Date(convertedTime).getDay()]}, ${new Date(convertedTime).getDay()} ${
+      months[new Date(convertedTime).getMonth()]
+    } | ${new Date(convertedTime).getHours()}:${
+      new Date(convertedTime).getMinutes() === 0 ? '00' : new Date(convertedTime).getMinutes()
+    }`;
+  };
 
   const deleteClient = id => {
     dispatch({ type: REMOVE_CLIENT, id });
@@ -190,19 +240,19 @@ const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
         <StyledList>
           <StyledListHeading>Contact info</StyledListHeading>
           <StyledListItem src={PhoneIcon} data-tooltip="Phone number">
-            <Link href={`tel:${phone}`}>{phone}</Link>
+            <Link href={`tel: ${phone} `}>{phone}</Link>
           </StyledListItem>
           <StyledListItem src={MailIcon} data-tooltip="email address">
-            <Link href={`mailto:${email}`}>{email}</Link>
+            <Link href={`mailto: ${email} `}>{email}</Link>
           </StyledListItem>
         </StyledList>
         <StyledList>
           <StyledListHeading>Visit info</StyledListHeading>
           <StyledListItem src={LipstickIcon} bold data-tooltip="All Visits">
-            23
+            {filteredAppointments.length}
           </StyledListItem>
           <StyledListItem src={VisitIcon} data-tooltip="Next visit">
-            tuesday, 27th june, 7 a.m.
+            {filteredAppointments.length ? nextVisit() : 'no planned visits yet'}
           </StyledListItem>
         </StyledList>
       </StyledBottomContainer>

@@ -13,6 +13,8 @@ import { routes } from 'routes';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import Modal from 'components/atoms/Modal/Modal';
+import { AppointmentsContext } from 'contexts/Appointments';
+import { ADD_APPOINTMENT } from 'reducers/Appointments';
 
 const Wrapper = styled.div`
   display: block;
@@ -405,8 +407,11 @@ const Error = styled.p`
 `;
 
 const AddAppointment = ({ history: { goBack } }) => {
+  const { dispatch } = useContext(AppointmentsContext);
+
   const { clients } = useContext(ClientsContext);
   const [inputValue, setInputValue] = useState('');
+  const [clientId, setClientId] = useState('');
   const [services, setServices] = useState([]);
   const [chosenServices, chooseService] = useState([]);
   const [focused, setFocus] = useState(false);
@@ -506,10 +511,10 @@ const AddAppointment = ({ history: { goBack } }) => {
     });
   };
 
-  const saveAppointment = (pickedServices, clientInfo, visitDate, status = 'planned') => {
+  const saveAppointment = (pickedServices, clientID, visitDate, status = 'planned') => {
     const errs = [];
 
-    if (clientInfo === '') errs.push('Who will be your client?');
+    if (clientID === '') errs.push('Who will be your client?');
 
     if (!pickedServices.length) errs.push('What you want to do with your client, huh?');
 
@@ -520,12 +525,15 @@ const AddAppointment = ({ history: { goBack } }) => {
 
     if (errs.length) return newError([...errs]);
 
-    return {
-      pickedServices,
-      clientInfo,
-      visitDate,
-      status,
-    };
+    return dispatch({
+      type: ADD_APPOINTMENT,
+      payload: {
+        pickedServices,
+        clientID,
+        visitDate,
+        status,
+      },
+    });
   };
 
   const months = [
@@ -624,6 +632,7 @@ const AddAppointment = ({ history: { goBack } }) => {
                     onClick={() => {
                       setInputValue(name);
                       setFocus(false);
+                      setClientId(clientID);
                     }}
                   >
                     {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
@@ -706,7 +715,7 @@ const AddAppointment = ({ history: { goBack } }) => {
         <Button onClick={() => goBack()} cancel="true">
           Cancel
         </Button>
-        <Button onClick={() => saveAppointment(chosenServices, inputValue, date)}>Save</Button>
+        <Button onClick={() => saveAppointment(chosenServices, clientId, date)}>Save</Button>
       </ButtonsContainer>
       <ErrorContainer>
         {errors.length > 0 && errors.map(err => <Error key={err}>{err}</Error>)}
