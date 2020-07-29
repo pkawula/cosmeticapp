@@ -325,8 +325,8 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                     setDate(new Date(year, month, currentDay));
                     if (optDate) {
                       changeDate(new Date(year, month, currentDay, 8, 0));
-                      setTimeout(() => toggleModal(), 200);
                     }
+                    if (toggleModal) setTimeout(() => toggleModal(), 200);
                   }}
                 >
                   {currentDay <= 0 || currentDay > daysInMonth

@@ -95,8 +95,7 @@ const StyledPenIcon = styled(PenIcon)`
   height: 2.5em;
 `;
 
-const Event = ({ time, firstName, lastName, services }) => {
-  const fullName = `${firstName} ${lastName}`;
+const Event = ({ time, fullName, services }) => {
   return (
     <EventWrapper>
       <InnerContainer>
@@ -113,8 +112,8 @@ const Event = ({ time, firstName, lastName, services }) => {
       <InnerContainer>
         <ClientName>{fullName}</ClientName>
         <ServicesContainer>
-          {services.map(service => (
-            <Service key={service}>{service}</Service>
+          {services.map(({ label }) => (
+            <Service key={label}>{label}</Service>
           ))}
         </ServicesContainer>
       </InnerContainer>
@@ -124,8 +123,7 @@ const Event = ({ time, firstName, lastName, services }) => {
 
 Event.propTypes = {
   time: propTypes.string.isRequired,
-  firstName: propTypes.string.isRequired,
-  lastName: propTypes.string.isRequired,
+  fullName: propTypes.string.isRequired,
   services: propTypes.arrayOf(propTypes.string).isRequired,
 };
 

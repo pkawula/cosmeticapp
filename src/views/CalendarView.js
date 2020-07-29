@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import Event from 'components/molecules/Event/Event';
+import { ClientsContext } from 'contexts/Clients';
+import { AppointmentsContext } from 'contexts/Appointments';
 
 const StyledWrapper = styled.section`
   width: 100%;
@@ -10,7 +12,7 @@ const StyledWrapper = styled.section`
 `;
 
 const StyledSectionTitle = styled.h3`
-  width: 100vh;
+  width: 100vw;
   margin: 0.5em 0;
   padding: 1em;
   background: hsl(0, 0%, 94%);
@@ -18,6 +20,14 @@ const StyledSectionTitle = styled.h3`
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   font-size: ${({ theme }) => theme.fontSize.m};
   box-shadow: 0px 3px 10px -3px hsla(0, 0%, 0%, 0.2);
+`;
+
+const StyledCurrentDay = styled.span`
+  display: inline;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.secondary};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  font-size: ${({ theme }) => theme.fontSize.m};
 `;
 
 const StyledNoEventInfo = styled.p`
@@ -46,25 +56,75 @@ const StyledEventsWrapper = styled.div`
 `;
 
 const CalendarView = () => {
+  const { clients } = useContext(ClientsContext);
+  const { appointments } = useContext(AppointmentsContext);
+
+  const today = new Date();
+
+  const [date, setDate] = useState(today);
+  const [day, setDay] = useState(date.getDate());
+  const [month, setMonth] = useState(date.getMonth());
+
+  useEffect(() => {
+    setDay(date.getDate());
+    setMonth(date.getMonth());
+  }, [date]);
+
+  const changeDate = e => setDate(e);
+
+  const formatDay = dayNumber => {
+    if (dayNumber === 1) return `${dayNumber}st`;
+    if (dayNumber === 2) return `${dayNumber}nd`;
+    if (dayNumber === 3) return `${dayNumber}rd`;
+    if (dayNumber === 21) return `${dayNumber}st`;
+    if (dayNumber === 22) return `${dayNumber}nd`;
+    if (dayNumber === 23) return `${dayNumber}rd`;
+    if (dayNumber === 31) return `${dayNumber}st`;
+    return `${dayNumber}th`;
+  };
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
   return (
     <StyledWrapper>
       <PageTitle>Calendar</PageTitle>
-      <Calendar />
-      <StyledSectionTitle>Your day | 11th May</StyledSectionTitle>
+      <Calendar changeDate={changeDate} optDate={today} />
+      <StyledSectionTitle>
+        Plans on{' '}
+        <StyledCurrentDay>
+          {formatDay(day)} {months[month]}
+        </StyledCurrentDay>
+      </StyledSectionTitle>
       <StyledNoEventInfo>nothing planned.. get some rest :) </StyledNoEventInfo>
       <StyledEventsWrapper>
-        <Event
-          time="9:30"
-          firstName="Piotr"
-          lastName="Kawula"
-          services={['manicure', 'pedicure']}
-        />
-        <Event
-          time="11:30"
-          firstName="Weronika"
-          lastName="Żurecka"
-          services={['manicure', 'henna', 'burger', 'fryty', 'picka', 'coca-cola']}
-        />
+        {appointments
+          .filter(
+            ({ visitDate }) =>
+              new Date(visitDate).getMonth() === month && new Date(visitDate).getDate() === day,
+          )
+          .map(({ pickedServices, clientID: client, visitDate }) => (
+            <Event
+              key={clients.find(({ clientID }) => clientID === client).name}
+              time={`${new Date(visitDate).getHours()}:${
+                new Date(visitDate).getMinutes() === 0 ? '00' : new Date(visitDate).getMinutes()
+              }`}
+              fullName={clients.find(({ clientID }) => clientID === client).name}
+              services={pickedServices}
+            />
+          ))}
       </StyledEventsWrapper>
     </StyledWrapper>
   );
