@@ -1,4 +1,4 @@
-import React, { useState, useEffect , useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
@@ -281,24 +281,14 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
 
   const checkIfPlannedVisit = dateToCheck => {
     const dayToCheck = dateToCheck.getDate();
-    // const monthToCheck = dateToCheck.getMonth();
+    const monthToCheck = dateToCheck.getMonth();
 
-    return appointments.filter(({ visitDate }) => new Date(visitDate).getDate() === dayToCheck)
-      .length;
-
-    // appointments.reduce((prevVal, curVal) => {
-    //   const prevDay = new Date(prevVal.visitDate).getDate();
-    //   const curDay = new Date(curVal.visitDate).getDate();
-    //   const prevMonth = new Date(prevVal.visitDate).getMonth();
-    //   const curMonth = new Date(curVal.visitDate).getMonth();
-
-    //   console.log((curDay - dayToCheck), (prevDay - dayToCheck), (curMonth - monthToCheck), (prevMonth - monthToCheck))
-
-    //   return ((curDay - dayToCheck) < (prevDay - dayToCheck) && (curMonth - monthToCheck) === (prevMonth - monthToCheck) ? curDay : prevDay);
-    // });
+    return appointments.filter(
+      ({ visitDate }) =>
+        new Date(visitDate).getDate() === dayToCheck &&
+        new Date(visitDate).getMonth() === monthToCheck,
+    ).length;
   };
-
-  // console.log(checkIfPlannedVisit(new Date(2020, 6, 31)))
 
   return (
     <StyledWrapper>
@@ -333,8 +323,10 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                   elseMonth={currentDay <= 0 || currentDay > daysInMonth}
                   onClick={() => {
                     setDate(new Date(year, month, currentDay));
-                    changeDate(new Date(year, month, currentDay, 8, 0));
-                    setTimeout(() => toggleModal(), 200);
+                    if (optDate) {
+                      changeDate(new Date(year, month, currentDay, 8, 0));
+                      setTimeout(() => toggleModal(), 200);
+                    }
                   }}
                 >
                   {currentDay <= 0 || currentDay > daysInMonth
@@ -367,11 +359,13 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                       ? new Date(itemToDisplay(), month, day)
                       : new Date(year, index, day),
                   );
-                  changeDate(
-                    itemToDisplay() === year + index
-                      ? new Date(itemToDisplay(), month, day, 8, 0)
-                      : new Date(year, index, day, 8, 0),
-                  );
+                  if (optDate) {
+                    changeDate(
+                      itemToDisplay() === year + index
+                        ? new Date(itemToDisplay(), month, day, 8, 0)
+                        : new Date(year, index, day, 8, 0),
+                    );
+                  }
                   countClick('decrement');
                 }}
               >
