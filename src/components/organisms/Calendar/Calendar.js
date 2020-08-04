@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
@@ -238,6 +238,14 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
   const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
   const [count, setCount] = useState(0);
 
+  const updateOuterDate = useCallback(
+    newDate => {
+      if (!optDate) return;
+      changeDate(newDate);
+    },
+    [changeDate, optDate],
+  );
+
   useEffect(() => {
     setDay(date.getDate());
     setMonth(date.getMonth());
@@ -245,7 +253,8 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
     setStartDay(getStartDayOfMonth(date));
     setEndDay(getEndDayOfMonth(date));
     setDaysInMonth(getDaysOfMonth(date));
-  }, [date]);
+    updateOuterDate(date);
+  }, [date, updateOuterDate]);
 
   const countClick = action => {
     if (count > 2) return setCount(2);
@@ -323,9 +332,6 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                   elseMonth={currentDay <= 0 || currentDay > daysInMonth}
                   onClick={() => {
                     setDate(new Date(year, month, currentDay));
-                    if (optDate) {
-                      changeDate(new Date(year, month, currentDay, 8, 0));
-                    }
                     if (toggleModal) setTimeout(() => toggleModal(), 200);
                   }}
                 >
@@ -359,13 +365,6 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
                       ? new Date(itemToDisplay(), month, day)
                       : new Date(year, index, day),
                   );
-                  if (optDate) {
-                    changeDate(
-                      itemToDisplay() === year + index
-                        ? new Date(itemToDisplay(), month, day, 8, 0)
-                        : new Date(year, index, day, 8, 0),
-                    );
-                  }
                   countClick('decrement');
                 }}
               >

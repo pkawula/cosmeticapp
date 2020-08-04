@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import { ReactComponent as SortArrow } from 'images/icons/sort_arrow.svg';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import Event from 'components/molecules/Event/Event';
 import { ClientsContext } from 'contexts/Clients';
 import { AppointmentsContext } from 'contexts/Appointments';
+import Button from 'components/atoms/Button/Button';
 
 const StyledWrapper = styled.section`
   width: 100%;
@@ -55,6 +57,37 @@ const StyledEventsWrapper = styled.div`
   }
 `;
 
+const StyledSortButton = styled(Button)`
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 0.5em;
+  background-color: ${({ theme }) => theme.secondary};
+  animation: none;
+`;
+
+const StyledSortArrow = styled(SortArrow)`
+  display: inline;
+  padding: 0;
+  margin: ${({ reversed }) => (reversed ? '0 0 0 .25em' : '0 .25em 0 0')};
+
+  path {
+    fill: #f9f9f9;
+    opacity: ${({ active }) => (active ? 1 : 0.5)};
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  ${({ reversed }) =>
+    reversed &&
+    css`
+      transform: rotate(180deg);
+    `}
+`;
+
+const SORT_DIRECTION = {
+  ASC: 'asc',
+  DESC: 'desc',
+};
+
 const CalendarView = () => {
   const { clients } = useContext(ClientsContext);
   const { appointments } = useContext(AppointmentsContext);
@@ -64,6 +97,28 @@ const CalendarView = () => {
   const [date, setDate] = useState(today);
   const [day, setDay] = useState(date.getDate());
   const [month, setMonth] = useState(date.getMonth());
+
+  const [sortDirection, setDirection] = useState(SORT_DIRECTION.ASC);
+
+  const changeSortDirection = () => {
+    if (sortDirection === SORT_DIRECTION.ASC) return setDirection(SORT_DIRECTION.DESC);
+    return setDirection(SORT_DIRECTION.ASC);
+  };
+
+  const sortAppointments = (first, second, direction) => {
+    const firstDate = new Date(first.visitDate).getTime();
+    const secondDate = new Date(second.visitDate).getTime();
+
+    if (direction === SORT_DIRECTION.ASC) return firstDate - secondDate;
+    return secondDate - firstDate;
+  };
+
+  const filteredAppointments = appointments
+    .filter(
+      ({ visitDate }) =>
+        new Date(visitDate).getMonth() === month && new Date(visitDate).getDate() === day,
+    )
+    .sort((firstItem, secondItem) => sortAppointments(firstItem, secondItem, sortDirection));
 
   useEffect(() => {
     setDay(date.getDate());
@@ -108,16 +163,19 @@ const CalendarView = () => {
           {formatDay(day)} {months[month]}
         </StyledCurrentDay>
       </StyledSectionTitle>
-      <StyledNoEventInfo>nothing planned.. get some rest :) </StyledNoEventInfo>
-      <StyledEventsWrapper>
-        {appointments
-          .filter(
-            ({ visitDate }) =>
-              new Date(visitDate).getMonth() === month && new Date(visitDate).getDate() === day,
-          )
-          .map(({ pickedServices, clientID: client, visitDate }) => (
+      <StyledSortButton
+        onClick={() => {
+          changeSortDirection();
+        }}
+      >
+        <StyledSortArrow active={sortDirection === SORT_DIRECTION.ASC ? 1 : 0} />
+        <StyledSortArrow active={sortDirection === SORT_DIRECTION.DESC ? 1 : 0} reversed />
+      </StyledSortButton>
+      {filteredAppointments.length ? (
+        <StyledEventsWrapper>
+          {filteredAppointments.map(({ pickedServices, clientID: client, visitDate, ID }) => (
             <Event
-              key={clients.find(({ clientID }) => clientID === client).name}
+              key={ID}
               time={`${new Date(visitDate).getHours()}:${
                 new Date(visitDate).getMinutes() === 0 ? '00' : new Date(visitDate).getMinutes()
               }`}
@@ -125,7 +183,10 @@ const CalendarView = () => {
               services={pickedServices}
             />
           ))}
-      </StyledEventsWrapper>
+        </StyledEventsWrapper>
+      ) : (
+        <StyledNoEventInfo>nothing planned.. get some rest :) </StyledNoEventInfo>
+      )}
     </StyledWrapper>
   );
 };

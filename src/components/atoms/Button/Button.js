@@ -59,7 +59,7 @@ const StyledButton = styled.button(
 const Button = ({ children, ...props }) => <StyledButton {...props}>{children}</StyledButton>;
 
 Button.propTypes = {
-  children: propTypes.string,
+  children: propTypes.oneOfType([propTypes.node, propTypes.string]),
   props: propTypes.oneOfType([propTypes.func, propTypes.bool, propTypes.string, propTypes.node]),
 };
 
