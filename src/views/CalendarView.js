@@ -7,6 +7,7 @@ import Event from 'components/molecules/Event/Event';
 import { ClientsContext } from 'contexts/Clients';
 import { AppointmentsContext } from 'contexts/Appointments';
 import Button from 'components/atoms/Button/Button';
+import { REMOVE_APPOINTMENT } from 'reducers/Appointments';
 
 const StyledWrapper = styled.section`
   width: 100%;
@@ -14,7 +15,7 @@ const StyledWrapper = styled.section`
 `;
 
 const StyledSectionTitle = styled.h3`
-  width: 100vw;
+  width: 100%;
   margin: 0.5em 0;
   padding: 1em;
   background: hsl(0, 0%, 94%);
@@ -57,6 +58,21 @@ const StyledEventsWrapper = styled.div`
   }
 `;
 
+const SectionContainer = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
+const Paragraph = styled.p`
+  display: inline;
+  margin-right: 0.25em;
+  font-size: ${({ theme }) => theme.fontSize.s};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  text-transform: uppercase;
+`;
+
 const StyledSortButton = styled(Button)`
   display: flex;
   flex-wrap: nowrap;
@@ -90,7 +106,7 @@ const SORT_DIRECTION = {
 
 const CalendarView = () => {
   const { clients } = useContext(ClientsContext);
-  const { appointments } = useContext(AppointmentsContext);
+  const { appointments, dispatch } = useContext(AppointmentsContext);
 
   const today = new Date();
 
@@ -153,6 +169,10 @@ const CalendarView = () => {
     'December',
   ];
 
+  const deleteVisit = id => {
+    dispatch({ type: REMOVE_APPOINTMENT, id });
+  };
+
   return (
     <StyledWrapper>
       <PageTitle>Calendar</PageTitle>
@@ -163,19 +183,24 @@ const CalendarView = () => {
           {formatDay(day)} {months[month]}
         </StyledCurrentDay>
       </StyledSectionTitle>
-      <StyledSortButton
-        onClick={() => {
-          changeSortDirection();
-        }}
-      >
-        <StyledSortArrow active={sortDirection === SORT_DIRECTION.ASC ? 1 : 0} />
-        <StyledSortArrow active={sortDirection === SORT_DIRECTION.DESC ? 1 : 0} reversed />
-      </StyledSortButton>
+      <SectionContainer>
+        <Paragraph>Sort by date:</Paragraph>
+        <StyledSortButton
+          onClick={() => {
+            changeSortDirection();
+          }}
+        >
+          <StyledSortArrow active={sortDirection === SORT_DIRECTION.ASC ? 1 : 0} />
+          <StyledSortArrow active={sortDirection === SORT_DIRECTION.DESC ? 1 : 0} reversed />
+        </StyledSortButton>
+      </SectionContainer>
       {filteredAppointments.length ? (
         <StyledEventsWrapper>
           {filteredAppointments.map(({ pickedServices, clientID: client, visitDate, ID }) => (
             <Event
               key={ID}
+              visitID={ID}
+              deleteVisit={deleteVisit}
               time={`${new Date(visitDate).getHours()}:${
                 new Date(visitDate).getMinutes() === 0 ? '00' : new Date(visitDate).getMinutes()
               }`}

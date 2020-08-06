@@ -162,8 +162,8 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
-  const { dispatch } = useContext(ClientsContext);
+const ClientCard = ({ name, phone, email, image, clientID }) => {
+  const { clients, dispatch } = useContext(ClientsContext);
   const { appointments } = useContext(AppointmentsContext);
 
   const [modalOpened, setModal] = useState(false);
@@ -171,6 +171,15 @@ const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
   const filteredAppointments = appointments.filter(
     appointment => appointment.clientID === clientID,
   );
+
+  const isTopCustomer = () => {
+    const findValueOfAppointments = id =>
+      appointments.filter(appointment => appointment.clientID === id).length;
+
+    return clients.reduce((a, b) =>
+      findValueOfAppointments(a.clientID) < findValueOfAppointments(b.clientID) ? b : a,
+    ).clientID;
+  };
 
   const months = [
     'January',
@@ -193,26 +202,38 @@ const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
     const today = new Date().getTime();
 
     const convertedTime = filteredAppointments.reduce((prevVal, curVal) => {
-      const prevValue = new Date(prevVal.visitDate).getTime();
-      const curValue = new Date(curVal.visitDate).getTime();
-      return Math.abs(curValue - today) < Math.abs(prevValue - today) ? prevValue : curValue;
+      const prevValue =
+        typeof prevVal === 'object'
+          ? new Date(prevVal.visitDate).getTime()
+          : new Date(prevVal).getTime();
+      const curValue =
+        typeof curVal === 'object'
+          ? new Date(curVal.visitDate).getTime()
+          : new Date(curVal).getTime();
+
+      return curValue > today && Math.abs(curValue - today) < Math.abs(prevValue - today)
+        ? curValue
+        : prevValue;
     });
 
-    if (typeof convertedTime === 'object')
-      return `${weekDays[new Date(convertedTime.visitDate).getDay()]}, ${new Date(
-        convertedTime.visitDate,
-      ).getDay()} ${months[new Date(convertedTime.visitDate).getMonth()]} | ${new Date(
-        convertedTime.visitDate,
-      ).getHours()}:${
-        new Date(convertedTime.visitDate).getMinutes() === 0
-          ? '00'
-          : new Date(convertedTime.visitDate).getMinutes()
-      }`;
+    if (typeof convertedTime === 'object') {
+      const visitTime = new Date(convertedTime.visitDate);
 
-    return `${weekDays[new Date(convertedTime).getDay()]}, ${new Date(convertedTime).getDay()} ${
-      months[new Date(convertedTime).getMonth()]
-    } | ${new Date(convertedTime).getHours()}:${
-      new Date(convertedTime).getMinutes() === 0 ? '00' : new Date(convertedTime).getMinutes()
+      if (visitTime.getTime() < today) return 'No new planned visits';
+
+      return `${weekDays[visitTime.getDay()]}, ${visitTime.getDate()} ${
+        months[visitTime.getMonth()]
+      } | ${visitTime.getHours()}:${visitTime.getMinutes() === 0 ? '00' : visitTime.getMinutes()}`;
+    }
+
+    const closestTime = new Date(convertedTime);
+
+    if (closestTime < today) return 'No new planned visits';
+
+    return `${weekDays[closestTime.getDay()]}, ${closestTime.getDate()} ${
+      months[closestTime.getMonth()]
+    } | ${closestTime.getHours()}:${
+      closestTime.getMinutes() === 0 ? '00' : closestTime.getMinutes()
     }`;
   };
 
@@ -231,7 +252,7 @@ const ClientCard = ({ topCustomer, name, phone, email, image, clientID }) => {
           <ButtonIcon onClick={() => deleteClient(clientID)} src={TrashIcon} alt="Delete" />
           <ButtonIcon onClick={() => toggleModal()} src={PenIcon} alt="Edit" />
         </StyledIconsContainer>
-        <StyledImageContainer topCustomer={topCustomer}>
+        <StyledImageContainer topCustomer={isTopCustomer() === clientID ? 1 : 0}>
           <StyledImage src={image || ProfilePicture} alt="Profile" />
         </StyledImageContainer>
         <StyledName>{name}</StyledName>
@@ -275,12 +296,10 @@ ClientCard.propTypes = {
   email: propTypes.string.isRequired,
   phone: propTypes.string.isRequired,
   clientID: propTypes.string.isRequired,
-  topCustomer: propTypes.bool,
   image: propTypes.string,
 };
 
 ClientCard.defaultProps = {
-  topCustomer: false,
   image: null,
 };
 

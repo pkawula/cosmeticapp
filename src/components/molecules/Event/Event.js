@@ -83,6 +83,12 @@ const ButtonIcon = styled.button`
   min-width: 2em;
   min-height: 2em;
   padding: 0.3em;
+  cursor: pointer;
+  transition: transform 0.3s ease-out;
+
+  &:hover {
+    transform: scale(0.9);
+  }
 `;
 
 const StyledTrashIcon = styled(TrashIcon)`
@@ -95,13 +101,13 @@ const StyledPenIcon = styled(PenIcon)`
   height: 2.5em;
 `;
 
-const Event = ({ time, fullName, services }) => {
+const Event = ({ time, fullName, services, deleteVisit, visitID }) => {
   return (
     <EventWrapper>
       <InnerContainer>
         <TimeText>{time}</TimeText>
         <IconsContainer>
-          <ButtonIcon>
+          <ButtonIcon onClick={() => deleteVisit(visitID)}>
             <StyledTrashIcon />
           </ButtonIcon>
           <ButtonIcon>
@@ -125,6 +131,8 @@ Event.propTypes = {
   time: propTypes.string.isRequired,
   fullName: propTypes.string.isRequired,
   services: propTypes.arrayOf(propTypes.string).isRequired,
+  deleteVisit: propTypes.func.isRequired,
+  visitID: propTypes.string.isRequired,
 };
 
 export default Event;
