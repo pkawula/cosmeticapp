@@ -113,6 +113,7 @@ const CalendarView = () => {
   const [date, setDate] = useState(today);
   const [day, setDay] = useState(date.getDate());
   const [month, setMonth] = useState(date.getMonth());
+  const [year, setYear] = useState(date.getFullYear());
 
   const [sortDirection, setDirection] = useState(SORT_DIRECTION.ASC);
 
@@ -132,13 +133,16 @@ const CalendarView = () => {
   const filteredAppointments = appointments
     .filter(
       ({ visitDate }) =>
-        new Date(visitDate).getMonth() === month && new Date(visitDate).getDate() === day,
+        new Date(visitDate).getMonth() === month &&
+        new Date(visitDate).getDate() === day &&
+        new Date(visitDate).getFullYear() === year,
     )
     .sort((firstItem, secondItem) => sortAppointments(firstItem, secondItem, sortDirection));
 
   useEffect(() => {
     setDay(date.getDate());
     setMonth(date.getMonth());
+    setYear(date.getFullYear());
   }, [date]);
 
   const changeDate = e => setDate(e);

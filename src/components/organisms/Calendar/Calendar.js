@@ -201,10 +201,6 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
     return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
   };
 
-  const getEndDayOfMonth = currentDate => {
-    return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDay();
-  };
-
   const getDaysOfMonth = currentMonth => {
     return new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   };
@@ -234,7 +230,6 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
   const [startDay, setStartDay] = useState(getStartDayOfMonth(date));
-  const [endDay, setEndDay] = useState(getEndDayOfMonth(date));
   const [daysInMonth, setDaysInMonth] = useState(getDaysOfMonth(date));
   const [count, setCount] = useState(0);
 
@@ -251,7 +246,6 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
     setMonth(date.getMonth());
     setYear(date.getFullYear());
     setStartDay(getStartDayOfMonth(date));
-    setEndDay(getEndDayOfMonth(date));
     setDaysInMonth(getDaysOfMonth(date));
     updateOuterDate(date);
   }, [date, updateOuterDate]);
@@ -271,7 +265,7 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
   };
 
   const chosenType = type => {
-    if (type === 0) return Array(daysInMonth + (startDay - 1) + (7 - endDay)).fill(null);
+    if (type === 0) return Array(42).fill(null);
     if (type === 2) return Array(10).fill(null);
     return months;
   };
@@ -291,11 +285,13 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
   const checkIfPlannedVisit = dateToCheck => {
     const dayToCheck = dateToCheck.getDate();
     const monthToCheck = dateToCheck.getMonth();
+    const yearToCheck = dateToCheck.getFullYear();
 
     return appointments.filter(
       ({ visitDate }) =>
         new Date(visitDate).getDate() === dayToCheck &&
-        new Date(visitDate).getMonth() === monthToCheck,
+        new Date(visitDate).getMonth() === monthToCheck &&
+        new Date(visitDate).getFullYear() === yearToCheck,
     ).length;
   };
 
@@ -321,8 +317,8 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
             ))}
           </StyledWeekNamesContainer>
           <StyledMonthDaysContainer>
-            {chosenType(0).map((name, index) => {
-              const currentDay = index - (startDay - 2);
+            {chosenType(0).map((_, index) => {
+              const currentDay = index - (startDay - 2 < 0 ? 5 - startDay : startDay - 2);
 
               return (
                 <StyledDay

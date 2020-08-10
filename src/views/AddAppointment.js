@@ -16,6 +16,11 @@ import Modal from 'components/atoms/Modal/Modal';
 import { AppointmentsContext } from 'contexts/Appointments';
 import { ADD_APPOINTMENT } from 'reducers/Appointments';
 
+const NOTIFICATION = {
+  SUCCESS: 'success',
+  FAIL: 'failure',
+};
+
 const Wrapper = styled.div`
   display: block;
   padding: 0.5em;
@@ -381,7 +386,7 @@ const StyledError = styled.p`
   margin: 0;
 `;
 
-const ErrorContainer = styled.div`
+const NotificationsContainer = styled.div`
   position: fixed;
   top: 1em;
   right: 1em;
@@ -394,9 +399,9 @@ const ErrorContainer = styled.div`
   flex-direction: column;
 `;
 
-const Error = styled.p`
+const Notification = styled.p`
   display: block;
-  background: hsla(356.9, 86.8%, 52.1%, 0.8);
+  background: ${({ type, theme }) => (type === NOTIFICATION.FAIL ? theme.cancel : theme.success)};
   margin: 0.5em auto;
   font-size: ${({ theme }) => theme.fontSize.xs};
   color: ${({ theme }) => theme.light};
@@ -408,14 +413,15 @@ const Error = styled.p`
 
 const AddAppointment = ({ history: { goBack } }) => {
   const { dispatch } = useContext(AppointmentsContext);
-
   const { clients } = useContext(ClientsContext);
+
+  const [notifications, setNotification] = useState([]);
+
   const [inputValue, setInputValue] = useState('');
   const [clientId, setClientId] = useState('');
   const [services, setServices] = useState([]);
   const [chosenServices, chooseService] = useState([]);
   const [focused, setFocus] = useState(false);
-  const [errors, setError] = useState([]);
   const [inputtedTime, setInputtedTime] = useState('');
   const [isEditing, setEdit] = useState(false);
 
@@ -430,15 +436,6 @@ const AddAppointment = ({ history: { goBack } }) => {
 
   const [modalOpened, setModal] = useState(false);
   const toggleModal = () => setModal(!modalOpened);
-
-  const newError = errs => {
-    const check = errors.map(e => errs.forEach(er => er.includes(e)));
-    if (check.length) return;
-
-    if (errors.find(e => e === errs.map(er => er))) return;
-    setError([...errors, ...errs]);
-    setTimeout(() => setError([]), 8000);
-  };
 
   const setAllServices = () => {
     const getAllServices = () => {
@@ -511,19 +508,45 @@ const AddAppointment = ({ history: { goBack } }) => {
     });
   };
 
+  const clearForm = () => {
+    chosenServices.map(({ label, iconUrl }) =>
+      setServices([...services, { label, iconUrl, chosen: false }]),
+    );
+    setInputValue('');
+    setClientId('');
+    setDate(today);
+  };
+
   const saveAppointment = (pickedServices, clientID, visitDate, status = 'planned') => {
-    const errs = [];
+    const notify = type =>
+      type === NOTIFICATION.FAIL
+        ? setTimeout(() => setNotification([]), 8000)
+        : setTimeout(() => setNotification([]), 8000);
 
-    if (clientID === '') errs.push('Who will be your client?');
+    const errors = [];
 
-    if (!pickedServices.length) errs.push('What you want to do with your client, huh?');
-
+    if (clientID === '')
+      errors.push({ type: NOTIFICATION.FAIL, message: 'Who will be your client?' });
+    if (!pickedServices.length)
+      errors.push({
+        type: NOTIFICATION.FAIL,
+        message: 'What you want to do with your client, huh??',
+      });
     if (visitDate.getTime() < today.getTime())
-      errs.push(
-        "There's not time machine, isn't it? Change visit time to the future, not the past :)",
-      );
+      errors.push({
+        type: NOTIFICATION.FAIL,
+        message:
+          "There's not time machine, isn't it? Change visit time to the future, not the past :)",
+      });
 
-    if (errs.length) return newError([...errs]);
+    if (errors.length) {
+      notify(NOTIFICATION.FAIL);
+      return setNotification([...errors]);
+    }
+
+    setNotification([{ type: NOTIFICATION.SUCCESS, message: 'Apppointment added successfully!' }]);
+    setTimeout(() => setNotification([]), 3000);
+    clearForm();
 
     return dispatch({
       type: ADD_APPOINTMENT,
@@ -717,9 +740,13 @@ const AddAppointment = ({ history: { goBack } }) => {
         </Button>
         <Button onClick={() => saveAppointment(chosenServices, clientId, date)}>Save</Button>
       </ButtonsContainer>
-      <ErrorContainer>
-        {errors.length > 0 && errors.map(err => <Error key={err}>{err}</Error>)}
-      </ErrorContainer>
+      <NotificationsContainer>
+        {notifications.map(({ type, message }) => (
+          <Notification key={message} type={type}>
+            {message}
+          </Notification>
+        ))}
+      </NotificationsContainer>
     </Wrapper>
   );
 };
