@@ -130,7 +130,7 @@ const Event = ({ time, fullName, services, deleteVisit, visitID }) => {
 Event.propTypes = {
   time: propTypes.string.isRequired,
   fullName: propTypes.string.isRequired,
-  services: propTypes.arrayOf(propTypes.string).isRequired,
+  services: propTypes.arrayOf(propTypes.object).isRequired,
   deleteVisit: propTypes.func.isRequired,
   visitID: propTypes.string.isRequired,
 };

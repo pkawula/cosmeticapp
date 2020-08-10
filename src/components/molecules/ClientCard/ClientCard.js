@@ -14,6 +14,7 @@ import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Link from 'components/atoms/Link/Link';
 import EditClient from 'components/organisms/EditClient/EditClient';
 import { AppointmentsContext } from 'contexts/Appointments';
+import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
 
 const StyledWrapper = styled.main`
   display: block;
@@ -167,6 +168,10 @@ const ClientCard = ({ name, phone, email, image, clientID }) => {
   const { appointments } = useContext(AppointmentsContext);
 
   const [modalOpened, setModal] = useState(false);
+  const [globalModalOpened, setGlobalModal] = useState(false);
+
+  const openGlobalModal = () => setGlobalModal(true);
+  const closeGlobalModal = () => setGlobalModal(false);
 
   const filteredAppointments = appointments.filter(
     appointment => appointment.clientID === clientID,
@@ -237,19 +242,23 @@ const ClientCard = ({ name, phone, email, image, clientID }) => {
     }`;
   };
 
-  const deleteClient = id => {
-    dispatch({ type: REMOVE_CLIENT, id });
-  };
+  const deleteClient = id => dispatch({ type: REMOVE_CLIENT, id });
 
   const toggleModal = () => {
     setModal(!modalOpened);
   };
 
+  const confirmFunc = () => {
+    closeGlobalModal();
+    deleteClient(clientID);
+  };
+
   return (
     <StyledWrapper>
+      {globalModalOpened && <GlobalModal confirm={confirmFunc} cancel={closeGlobalModal} />}
       <StyledTopContainer>
         <StyledIconsContainer>
-          <ButtonIcon onClick={() => deleteClient(clientID)} src={TrashIcon} alt="Delete" />
+          <ButtonIcon onClick={() => openGlobalModal()} src={TrashIcon} alt="Delete" />
           <ButtonIcon onClick={() => toggleModal()} src={PenIcon} alt="Edit" />
         </StyledIconsContainer>
         <StyledImageContainer topCustomer={isTopCustomer() === clientID ? 1 : 0}>
