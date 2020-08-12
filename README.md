@@ -3,7 +3,7 @@ Application which help you maintain your cosmetic business. Save clients, theirs
 
 ## Features
 
-# Dashboard
+### Dashboard
 Place in app where you can decide what to do first.
 You can choose from couple features:
 - Add new clients
