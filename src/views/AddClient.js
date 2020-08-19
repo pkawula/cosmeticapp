@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { routes } from 'routes';
 import { ClientsContext } from 'contexts/Clients';
 import { ADD_CLIENT } from 'reducers/Clients';
+import PageTitle from 'components/atoms/PageTitle/PageTitle';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -161,6 +162,7 @@ const AddClient = ({ history: { goBack } }) => {
 
   return (
     <StyledWrapper>
+      <PageTitle>Add new client</PageTitle>
       <StyledLabelContainer>
         <StyledLabel title="add/change image">
           <StyledImage src={client.image || ProfilePicture} alt="Profile picture" />
@@ -199,7 +201,7 @@ const AddClient = ({ history: { goBack } }) => {
           value={client.email ? client.email : ''}
         />
         <StyledSubmittingContainer>
-          <Button cancel="true" onClick={e => cancel(e)}>
+          <Button type="button" cancel="true" onClick={e => cancel(e)}>
             Cancel
           </Button>
           <Button disabled={!buttonActive} type="submit" onClick={e => handleSubmit(e)}>

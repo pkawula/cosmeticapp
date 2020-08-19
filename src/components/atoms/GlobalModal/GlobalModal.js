@@ -6,6 +6,8 @@ import Button from '../Button/Button';
 const Wrapper = styled.div`
   display: flex;
   width: 90%;
+  max-width: 30%;
+  min-width: 300px;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;

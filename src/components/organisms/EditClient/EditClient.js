@@ -6,6 +6,7 @@ import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 import { ClientsContext } from 'contexts/Clients';
 import { UPDATE_CLIENT } from 'reducers/Clients';
+import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -161,6 +162,10 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
   const [client, setClient] = useState({ name, email, phone, image, clientID });
   const [error, setError] = useState('');
   const [buttonActive, setButton] = useState(true);
+  const [globalModalOpened, setGlobalModal] = useState(false);
+
+  const openGlobalModal = () => setGlobalModal(true);
+  const closeGlobalModal = () => setGlobalModal(false);
 
   const onImageChange = e => {
     const file = e.target.files[0];
@@ -201,8 +206,15 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
     }
   };
 
+  const proceed = e => {
+    onSave(e);
+    closeGlobalModal();
+    toggleModalFunc();
+  };
+
   return (
     <StyledWrapper>
+      {globalModalOpened && <GlobalModal confirm={e => proceed(e)} cancel={closeGlobalModal} />}
       <StyledCloseButton onClick={() => toggleModalFunc()} />
       <StyledLabelContainer>
         <StyledLabel title="add/change image">
@@ -238,14 +250,7 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
       <Button cancel onClick={() => toggleModalFunc()}>
         Cancel
       </Button>
-      <Button
-        type="submit"
-        onClick={e => {
-          onSave(e);
-          toggleModalFunc();
-        }}
-        disabled={!buttonActive}
-      >
+      <Button type="submit" onClick={openGlobalModal} disabled={!buttonActive}>
         Save
       </Button>
       <ErrorContainer>

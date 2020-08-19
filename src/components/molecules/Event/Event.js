@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import propTypes from 'prop-types';
 import { ReactComponent as TrashIcon } from 'images/icons/delete_icon.svg';
 import { ReactComponent as PenIcon } from 'images/icons/pen_icon.svg';
+import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
 
 const EventWrapper = styled.div`
   margin: 1em;
@@ -102,12 +103,23 @@ const StyledPenIcon = styled(PenIcon)`
 `;
 
 const Event = ({ time, fullName, services, deleteVisit, visitID }) => {
+  const [globalModalOpened, setGlobalModal] = useState(false);
+
+  const openModal = () => setGlobalModal(true);
+  const closeModal = () => setGlobalModal(false);
+
+  const confirmFunc = () => {
+    deleteVisit(visitID);
+    closeModal();
+  };
+
   return (
     <EventWrapper>
+      {globalModalOpened && <GlobalModal confirm={confirmFunc} cancel={closeModal} />}
       <InnerContainer>
         <TimeText>{time}</TimeText>
         <IconsContainer>
-          <ButtonIcon onClick={() => deleteVisit(visitID)}>
+          <ButtonIcon onClick={() => openModal()}>
             <StyledTrashIcon />
           </ButtonIcon>
           <ButtonIcon>

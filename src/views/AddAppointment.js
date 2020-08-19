@@ -30,6 +30,16 @@ const Wrapper = styled.div`
 const Section = styled.section`
   display: block;
   width: 100%;
+  animation: slideInLeft 0.3s ease-in-out 1;
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-50px);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
 `;
 
 const SectionTitle = styled.h2`
@@ -465,7 +475,9 @@ const AddAppointment = ({ history: { goBack } }) => {
     );
     const formattedData = Promise.all(allData)
       .then(data => setServices(data))
-      .catch(err => console.log(err));
+      .catch(err => {
+        throw new Error(err);
+      });
     return formattedData;
   };
 
@@ -509,9 +521,13 @@ const AddAppointment = ({ history: { goBack } }) => {
   };
 
   const clearForm = () => {
+    const servicesToDeselect = [];
     chosenServices.map(({ label, iconUrl }) =>
-      setServices([...services, { label, iconUrl, chosen: false }]),
+      servicesToDeselect.push({ label, iconUrl, chosen: false }),
     );
+
+    setServices([...services, ...servicesToDeselect]);
+    chooseService([]);
     setInputValue('');
     setClientId('');
     setDate(today);
@@ -546,6 +562,7 @@ const AddAppointment = ({ history: { goBack } }) => {
 
     setNotification([{ type: NOTIFICATION.SUCCESS, message: 'Apppointment added successfully!' }]);
     setTimeout(() => setNotification([]), 3000);
+
     clearForm();
 
     return dispatch({
@@ -631,7 +648,7 @@ const AddAppointment = ({ history: { goBack } }) => {
 
   return (
     <Wrapper>
-      <PageTitle>make new appointment</PageTitle>
+      <PageTitle>Make new appointment</PageTitle>
       <Section>
         <SectionTitle>Choose client</SectionTitle>
         <SearchWrapper>
@@ -665,12 +682,18 @@ const AddAppointment = ({ history: { goBack } }) => {
           </SearchResults>
         </SearchWrapper>
       </Section>
-      <Section>
-        <SectionTitle>or add new one</SectionTitle>
-        <Button to={routes.addClient} as={Link} style={{ display: 'block', width: 'fit-content' }}>
-          Add new client
-        </Button>
-      </Section>
+      {inputValue.length === 0 && (
+        <Section>
+          <SectionTitle>or add new one</SectionTitle>
+          <Button
+            to={routes.addClient}
+            as={Link}
+            style={{ display: 'block', width: 'fit-content' }}
+          >
+            Add new client
+          </Button>
+        </Section>
+      )}
       <Section>
         <SectionTitle>choose a service</SectionTitle>
         <ServicesContainer>
