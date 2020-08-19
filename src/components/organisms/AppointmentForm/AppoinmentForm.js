@@ -1,31 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
-import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
+import styled, { css } from 'styled-components';
+import { Link } from 'react-router-dom';
+import { routes } from 'routes';
 import { ClientsContext } from 'contexts/Clients';
-import PageTitle from 'components/atoms/PageTitle/PageTitle';
+import { AppointmentsContext } from 'contexts/Appointments';
+import { ADD_APPOINTMENT } from 'reducers/Appointments';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import { ReactComponent as PersonIcon } from 'images/person.svg';
 import DeleteIcon from 'images/icons/delete_icon.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
-import { Link } from 'react-router-dom';
-import { routes } from 'routes';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import Modal from 'components/atoms/Modal/Modal';
-import { AppointmentsContext } from 'contexts/Appointments';
-import { ADD_APPOINTMENT } from 'reducers/Appointments';
 
 const NOTIFICATION = {
   SUCCESS: 'success',
   FAIL: 'failure',
 };
-
-const Wrapper = styled.div`
-  display: block;
-  padding: 0.5em;
-  margin: 0;
-`;
 
 const Section = styled.section`
   display: block;
@@ -421,22 +414,28 @@ const Notification = styled.p`
   padding: 0.5em;
 `;
 
-const AddAppointment = ({ history: { goBack } }) => {
+const AppoinmentForm = ({
+  history: { goBack },
+  pickedServices: pickedServicesToEdit,
+  visitDate: dateToEdit,
+  clientName,
+  clientId: editClientId,
+}) => {
   const { dispatch } = useContext(AppointmentsContext);
   const { clients } = useContext(ClientsContext);
 
   const [notifications, setNotification] = useState([]);
 
-  const [inputValue, setInputValue] = useState('');
-  const [clientId, setClientId] = useState('');
+  const [inputValue, setInputValue] = useState(clientName);
+  const [clientId, setClientId] = useState(editClientId);
   const [services, setServices] = useState([]);
-  const [chosenServices, chooseService] = useState([]);
+  const [chosenServices, chooseService] = useState(pickedServicesToEdit);
   const [focused, setFocus] = useState(false);
   const [inputtedTime, setInputtedTime] = useState('');
   const [isEditing, setEdit] = useState(false);
 
   const today = new Date();
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(new Date(dateToEdit));
   const [hours, setHours] = useState(today.getHours());
   const [minutes, setMinutes] = useState(today.getMinutes());
   const [weekDay, setWeekDay] = useState(today.getDay());
@@ -449,7 +448,7 @@ const AddAppointment = ({ history: { goBack } }) => {
 
   const setAllServices = () => {
     const getAllServices = () => {
-      const allIcons = require.context('../images/icons/services', false, /.*\.svg$/);
+      const allIcons = require.context('../../../images/icons/services', false, /.*\.svg$/);
       const icons = [];
 
       const addImage = async imageName => {
@@ -647,8 +646,7 @@ const AddAppointment = ({ history: { goBack } }) => {
   };
 
   return (
-    <Wrapper>
-      <PageTitle>Make new appointment</PageTitle>
+    <>
       <Section>
         <SectionTitle>Choose client</SectionTitle>
         <SearchWrapper>
@@ -770,15 +768,26 @@ const AddAppointment = ({ history: { goBack } }) => {
           </Notification>
         ))}
       </NotificationsContainer>
-    </Wrapper>
+    </>
   );
 };
 
-AddAppointment.propTypes = {
+AppoinmentForm.propTypes = {
   history: propTypes.shape({
     goBack: propTypes.func.isRequired,
     length: propTypes.number.isRequired,
   }).isRequired,
+  pickedServices: propTypes.arrayOf(propTypes.object),
+  visitDate: propTypes.objectOf(propTypes.object),
+  clientName: propTypes.string,
+  clientId: propTypes.string,
 };
 
-export default AddAppointment;
+AppoinmentForm.defaultProps = {
+  pickedServices: [],
+  visitDate: new Date(),
+  clientName: '',
+  clientId: '',
+};
+
+export default AppoinmentForm;

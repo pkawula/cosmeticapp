@@ -4,6 +4,7 @@ import propTypes from 'prop-types';
 import { ReactComponent as TrashIcon } from 'images/icons/delete_icon.svg';
 import { ReactComponent as PenIcon } from 'images/icons/pen_icon.svg';
 import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
+import { Link } from 'react-router-dom';
 
 const EventWrapper = styled.div`
   margin: 1em;
@@ -122,9 +123,9 @@ const Event = ({ time, fullName, services, deleteVisit, visitID }) => {
           <ButtonIcon onClick={() => openModal()}>
             <StyledTrashIcon />
           </ButtonIcon>
-          <ButtonIcon>
+          <Link as={ButtonIcon} to={`/appointments/edit/${visitID}`}>
             <StyledPenIcon />
-          </ButtonIcon>
+          </Link>
         </IconsContainer>
       </InnerContainer>
       <InnerContainer>
