@@ -19,12 +19,13 @@ const StyledWrapper = styled.div`
   box-shadow: 0px 0px 200px -30px hsla(0, 0%, 0%, 0.7);
   background: ${({ theme }) => theme.light};
   position: fixed;
-  top: 1em;
-  left: 1em;
-  right: 1em;
-  z-index: 999;
-  animation: fadeIn 0.3s ease-in-out 1;
-  overflow-y: scroll;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ${({ animationIn }) =>
+    animationIn ? 'fadeIn 0.3s ease-in-out 1' : 'fadeOut 0.3s ease-in-out 1'};
+  overflow-y: auto;
+  z-index: 2;
 
   @keyframes fadeIn {
     from {
@@ -32,6 +33,15 @@ const StyledWrapper = styled.div`
     }
     to {
       opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
     }
   }
 `;
@@ -101,8 +111,8 @@ const StyledCloseButton = styled.button`
   width: 2em;
   height: 2em;
   position: absolute;
-  top: 0.5em;
-  right: 0.5em;
+  top: 1em;
+  right: 1em;
   padding: 1.5em;
   margin: 0;
   border: none;
@@ -163,6 +173,9 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
   const [error, setError] = useState('');
   const [buttonActive, setButton] = useState(true);
   const [globalModalOpened, setGlobalModal] = useState(false);
+  const [animationIn, setAnimationIn] = useState(true);
+
+  const toggleAnimationIn = () => setAnimationIn(!animationIn);
 
   const openGlobalModal = () => setGlobalModal(true);
   const closeGlobalModal = () => setGlobalModal(false);
@@ -213,9 +226,14 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
   };
 
   return (
-    <StyledWrapper>
+    <StyledWrapper animationIn={animationIn}>
       {globalModalOpened && <GlobalModal confirm={e => proceed(e)} cancel={closeGlobalModal} />}
-      <StyledCloseButton onClick={() => toggleModalFunc()} />
+      <StyledCloseButton
+        onClick={() => {
+          toggleAnimationIn();
+          setTimeout(() => toggleModalFunc(), 300);
+        }}
+      />
       <StyledLabelContainer>
         <StyledLabel title="add/change image">
           <StyledImage src={client.image || ProfilePicture} alt="Profile picture" />
@@ -247,10 +265,23 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
           id="email"
         />
       </StyledInputContainer>
-      <Button cancel onClick={() => toggleModalFunc()}>
+      <Button
+        cancel
+        onClick={() => {
+          toggleAnimationIn();
+          setTimeout(() => toggleModalFunc(), 300);
+        }}
+      >
         Cancel
       </Button>
-      <Button type="submit" onClick={openGlobalModal} disabled={!buttonActive}>
+      <Button
+        type="submit"
+        onClick={() => {
+          toggleAnimationIn();
+          setTimeout(() => openGlobalModal(), 300);
+        }}
+        disabled={!buttonActive}
+      >
         Save
       </Button>
       <ErrorContainer>

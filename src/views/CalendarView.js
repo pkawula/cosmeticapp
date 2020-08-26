@@ -11,7 +11,9 @@ import { REMOVE_APPOINTMENT } from 'reducers/Appointments';
 
 const StyledWrapper = styled.section`
   width: 100%;
-  padding: 0 0.5em;
+  padding: 1em 0.5em 0 0.5em;
+  border-radius: 1em 1em 0;
+  background: ${({ theme }) => theme.light};
 `;
 
 const StyledSectionTitle = styled.h3`

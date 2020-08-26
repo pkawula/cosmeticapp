@@ -9,7 +9,9 @@ import { routes } from 'routes';
 const StyledContainer = styled.div`
   width: 100%;
   margin: 0;
-  padding: 0 0.5em;
+  border-radius: 1em 1em 0;
+  padding: 1em 0.5em 0 0.5em;
+  background: ${({ theme }) => theme.light};
 `;
 
 const Panel = () => (

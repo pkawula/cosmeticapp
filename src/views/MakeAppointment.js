@@ -6,7 +6,9 @@ import AppoinmentForm from 'components/organisms/AppointmentForm/AppoinmentForm'
 
 const Wrapper = styled.div`
   display: block;
-  padding: 0.5em;
+  border-radius: 1em 1em 0;
+  padding: 1em 0.5em 0 0.5em;
+  background: ${({ theme }) => theme.light};
 `;
 
 const MakeAppointment = ({ history }) => (

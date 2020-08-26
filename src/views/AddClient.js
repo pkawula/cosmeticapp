@@ -12,11 +12,9 @@ import PageTitle from 'components/atoms/PageTitle/PageTitle';
 
 const StyledWrapper = styled.div`
   width: 100%;
-  max-width: 90%;
-  box-shadow: 2px 2px 15px -4px hsla(0, 0%, 0%, 0.2);
-  background-color: ${({ theme }) => theme.light};
-  padding: 1em;
-  margin: 2em auto;
+  border-radius: 1em 1em 0;
+  padding: 1em 0.5em 0 0.5em;
+  background: ${({ theme }) => theme.light};
 `;
 
 const StyledLabelContainer = styled.div`

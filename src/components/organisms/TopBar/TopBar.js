@@ -9,7 +9,8 @@ import { routes } from 'routes';
 
 const StyledHeader = styled.header`
   width: 100vw;
-  min-height: 3em;
+  min-height: 4em;
+  z-index: -1;
   background-color: ${({ theme }) => theme.bg};
   display: flex;
   flex-wrap: nowrap;
@@ -17,6 +18,8 @@ const StyledHeader = styled.header`
   align-items: center;
   padding-left: 0.5em;
   padding-right: 0.5em;
+  padding-bottom: 1em;
+  margin-bottom: -1em;
   box-shadow: 0px 5px 15px -3px hsla(0, 0%, 0%, 0.2);
 `;
 

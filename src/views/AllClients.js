@@ -11,7 +11,9 @@ import SearchBar from 'components/molecules/SearchBar/SearchBar';
 const StyledWrapper = styled.div`
   display: block;
   margin: 0;
-  padding: 1em;
+  padding: 1em 0.5em 0 0.5em;
+  border-radius: 1em 1em 0;
+  background: ${({ theme }) => theme.light};
 `;
 
 const StyledCardContainer = styled.div`

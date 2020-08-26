@@ -7,7 +7,9 @@ import { AppointmentsContext } from 'contexts/Appointments';
 import { ClientsContext } from 'contexts/Clients';
 
 const Wrapper = styled.div`
-  padding: 0.5em;
+  padding: 1em 0.5em 0 0.5em;
+  border-radius: 1em 1em 0;
+  background: ${({ theme }) => theme.light};
 `;
 
 const EditAppointment = ({
