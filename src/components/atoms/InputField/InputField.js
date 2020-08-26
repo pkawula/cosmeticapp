@@ -43,6 +43,11 @@ const StyledInput = styled.input`
   &:not([value='']) {
     border-bottom-color: ${({ theme }) => theme.success};
   }
+
+  &:disabled {
+    color: hsl(0, 0%, 30%);
+    opacity: 0.7;
+  }
 `;
 
 const InputField = ({ type, name, placeholder, ...props }) => (

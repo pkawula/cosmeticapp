@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import propTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
 import { ClientsContext } from 'contexts/Clients';
 import { AppointmentsContext } from 'contexts/Appointments';
-import { ADD_APPOINTMENT } from 'reducers/Appointments';
+import { ADD_APPOINTMENT, UPDATE_APPOINTMENT } from 'reducers/Appointments';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import { ReactComponent as PersonIcon } from 'images/person.svg';
 import DeleteIcon from 'images/icons/delete_icon.svg';
@@ -14,6 +14,7 @@ import Button from 'components/atoms/Button/Button';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import Modal from 'components/atoms/Modal/Modal';
+import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
 
 const NOTIFICATION = {
   SUCCESS: 'success',
@@ -420,11 +421,15 @@ const AppoinmentForm = ({
   visitDate: dateToEdit,
   clientName,
   clientId: editClientId,
+  appointmentId,
 }) => {
   const { dispatch } = useContext(AppointmentsContext);
   const { clients } = useContext(ClientsContext);
 
   const [notifications, setNotification] = useState([]);
+
+  const [globalModalOpened, setGlobalModalOpened] = useState(false);
+  const toggleGlobalModal = () => setGlobalModalOpened(!globalModalOpened);
 
   const [inputValue, setInputValue] = useState(clientName);
   const [clientId, setClientId] = useState(editClientId);
@@ -446,7 +451,7 @@ const AppoinmentForm = ({
   const [modalOpened, setModal] = useState(false);
   const toggleModal = () => setModal(!modalOpened);
 
-  const setAllServices = () => {
+  const setAllServices = useCallback(() => {
     const getAllServices = () => {
       const allIcons = require.context('../../../images/icons/services', false, /.*\.svg$/);
       const icons = [];
@@ -472,17 +477,27 @@ const AppoinmentForm = ({
         chosen: false,
       })),
     );
-    const formattedData = Promise.all(allData)
-      .then(data => setServices(data))
+    const setData = Promise.all(allData)
+      .then(data => {
+        if (pickedServicesToEdit.length) {
+          pickedServicesToEdit.forEach(({ label }) => {
+            const a = data.filter(service => service.label !== label);
+            setServices(a);
+          });
+        } else {
+          setServices(data);
+        }
+      })
       .catch(err => {
         throw new Error(err);
       });
-    return formattedData;
-  };
+
+    return setData;
+  }, [pickedServicesToEdit]);
 
   useEffect(() => {
     setAllServices();
-  }, []);
+  }, [setAllServices]);
 
   const handleUserInput = e => {
     const { value } = e.target;
@@ -536,7 +551,7 @@ const AppoinmentForm = ({
     const notify = type =>
       type === NOTIFICATION.FAIL
         ? setTimeout(() => setNotification([]), 8000)
-        : setTimeout(() => setNotification([]), 8000);
+        : setTimeout(() => setNotification([]), 3000);
 
     const errors = [];
 
@@ -559,8 +574,25 @@ const AppoinmentForm = ({
       return setNotification([...errors]);
     }
 
+    if (appointmentId) {
+      setNotification([
+        { type: NOTIFICATION.SUCCESS, message: 'Appointment updated successfully!' },
+      ]);
+
+      return dispatch({
+        type: UPDATE_APPOINTMENT,
+        payload: {
+          pickedServices,
+          clientID,
+          visitDate,
+          status,
+          ID: appointmentId,
+        },
+      });
+    }
+
     setNotification([{ type: NOTIFICATION.SUCCESS, message: 'Apppointment added successfully!' }]);
-    setTimeout(() => setNotification([]), 3000);
+    notify(NOTIFICATION.SUCCESS);
 
     clearForm();
 
@@ -645,9 +677,15 @@ const AppoinmentForm = ({
     return `${dayNumber}th`;
   };
 
+  const confirmFunc = () => {
+    saveAppointment(chosenServices, clientId, date);
+    toggleGlobalModal();
+  };
+
   return (
     <>
       <Section>
+        {globalModalOpened && <GlobalModal confirm={confirmFunc} cancel={toggleGlobalModal} />}
         <SectionTitle>Choose client</SectionTitle>
         <SearchWrapper>
           <InputSearchField
@@ -655,6 +693,7 @@ const AppoinmentForm = ({
             placeholder="Search"
             name="searchbar"
             value={inputValue}
+            disabled={editClientId}
             onChange={e => handleUserInput(e)}
             onFocus={() => setFocus(true)}
             onBlur={() => setFocus(false)}
@@ -759,7 +798,11 @@ const AppoinmentForm = ({
         <Button onClick={() => goBack()} cancel="true">
           Cancel
         </Button>
-        <Button onClick={() => saveAppointment(chosenServices, clientId, date)}>Save</Button>
+        {appointmentId ? (
+          <Button onClick={toggleGlobalModal}>Save</Button>
+        ) : (
+          <Button onClick={() => saveAppointment(chosenServices, clientId, date)}>Save</Button>
+        )}
       </ButtonsContainer>
       <NotificationsContainer>
         {notifications.map(({ type, message }) => (
@@ -781,6 +824,7 @@ AppoinmentForm.propTypes = {
   visitDate: propTypes.objectOf(propTypes.object),
   clientName: propTypes.string,
   clientId: propTypes.string,
+  appointmentId: propTypes.string,
 };
 
 AppoinmentForm.defaultProps = {
@@ -788,6 +832,7 @@ AppoinmentForm.defaultProps = {
   visitDate: new Date(),
   clientName: '',
   clientId: '',
+  appointmentId: '',
 };
 
 export default AppoinmentForm;

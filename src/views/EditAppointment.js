@@ -35,6 +35,7 @@ const EditAppointment = ({
         clientName={name}
         clientId={clientId}
         history={history}
+        appointmentId={id}
       />
     </Wrapper>
   );
