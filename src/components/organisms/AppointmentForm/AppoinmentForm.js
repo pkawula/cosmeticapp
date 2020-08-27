@@ -480,10 +480,10 @@ const AppoinmentForm = ({
     const setData = Promise.all(allData)
       .then(data => {
         if (pickedServicesToEdit.length) {
-          pickedServicesToEdit.forEach(({ label }) => {
-            const a = data.filter(service => service.label !== label);
-            setServices(a);
-          });
+          const newData = data.filter(
+            ({ label }) => !pickedServicesToEdit.filter(service => service.label === label).length,
+          );
+          setServices(newData);
         } else {
           setServices(data);
         }
