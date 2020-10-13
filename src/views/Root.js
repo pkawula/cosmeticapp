@@ -13,6 +13,7 @@ import AllClients from './AllClients';
 import CalendarView from './CalendarView';
 import MakeAppointment from './MakeAppointment';
 import EditAppointment from './EditAppointment';
+import ManageAppointments from './ManageAppointments';
 
 const Root = () => (
   <BrowserRouter>
@@ -29,6 +30,7 @@ const Root = () => (
             <Route path={routes.calendar} component={CalendarView} />
             <Route exact path={routes.addAppointment} component={MakeAppointment} />
             <Route path={routes.editAppointment} component={EditAppointment} />
+            <Route path={routes.manageAppointments} component={ManageAppointments} />
           </Switch>
         </AppointmentsContextProvider>
       </ClientsContextProvider>

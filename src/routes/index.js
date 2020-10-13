@@ -5,6 +5,7 @@ export const routes = {
   appointments: '/appointments',
   addAppointment: '/appointments/add',
   editAppointment: '/appointments/edit/:id',
+  manageAppointments: '/manage-appointments',
   calendar: '/calendar',
   settings: '/settings',
   login: '/login',
