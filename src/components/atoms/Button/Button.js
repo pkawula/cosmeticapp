@@ -10,7 +10,7 @@ const StyledButton = styled.button(
     background-color: ${theme.primary};
     font-weight: ${theme.fontWeight.bold};
     font-size: ${theme.fontSize.s};
-    padding: 0.5em 1em;
+    padding: 0.5em 2em;
     margin: 0.5em;
     border-radius: 10px;
     border: 3px solid transparent;

@@ -16,7 +16,7 @@ const StyledHeading = styled.h1(
     font-size: ${theme.fontSize.m};
     font-weight: ${theme.fontWeight.bold};
     color: ${theme.light};
-    background-color: ${theme.bg};
+    background-image: ${`linear-gradient(135deg, ${theme.secondary}, ${theme.bg})`};
     display: block;
     margin: 0.5em auto;
     padding: 0.3em 0;

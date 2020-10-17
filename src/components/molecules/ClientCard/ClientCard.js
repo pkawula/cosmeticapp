@@ -16,7 +16,7 @@ import EditClient from 'components/organisms/EditClient/EditClient';
 import { AppointmentsContext } from 'contexts/Appointments';
 import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
 
-const StyledWrapper = styled.main`
+const StyledWrapper = styled.section`
   display: block;
   min-height: 250px;
   width: 100%;
@@ -27,7 +27,7 @@ const StyledWrapper = styled.main`
   margin: 2em auto;
 `;
 
-const StyledTopContainer = styled.section`
+const StyledTopContainer = styled.article`
   display: block;
   position: relative;
   border-bottom: 2px solid ${({ theme }) => theme.black};
@@ -48,6 +48,7 @@ const StyledIconsContainer = styled.div`
 const StyledImageContainer = styled.div`
   position: relative;
   width: 100%;
+  background-color: ${({ theme }) => theme.light};
 
   ${({ topCustomer, theme }) =>
     topCustomer &&
@@ -60,7 +61,7 @@ const StyledImageContainer = styled.div`
         bottom: -0.5em;
         left: 50%;
         transform: translateX(-50%);
-        background: ${theme.bg};
+        background-image: ${`linear-gradient(135deg, ${theme.secondary}, ${theme.bg})`};
         font-size: ${theme.fontSize.s};
         font-weight: ${theme.fontWeight.bold};
         color: ${theme.light};

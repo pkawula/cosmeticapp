@@ -1,7 +1,9 @@
 export const theme = {
-  bg: 'hsl(336,100%,56%)',
-  primary: 'hsl(220, 37%, 53%)',
-  secondary: 'hsl(318, 60%, 60%)',
+  bg: 'hsl(306, 76%, 36%)',
+  primary: 'hsl(245, 43%, 21%)',
+  secondary: 'hsl(346, 100%, 65%)',
+  experimental: 'hsl(346, 100%, 65%)',
+  experimental2: 'hsl(306, 76%, 36%)',
   light: 'hsl(0, 0%, 97%)',
   black: 'hsl(0, 0%, 20%)',
   lightBlack: 'hsl(0, 0%, 40%)',

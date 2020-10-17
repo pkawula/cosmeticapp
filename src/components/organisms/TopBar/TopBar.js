@@ -1,17 +1,18 @@
 import React from 'react';
-import Logo from 'components/atoms/Logo/Logo';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import { routes } from 'routes';
+import Logo from 'components/atoms/Logo/Logo';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import SettingsIcon from 'images/icons/settings_icon.svg';
 import LogoutIcon from 'images/icons/logout_icon.svg';
-import { Link } from 'react-router-dom';
-import { routes } from 'routes';
+import { auth } from '../../../firebase';
 
 const StyledHeader = styled.header`
   width: 100vw;
   min-height: 4em;
   z-index: -1;
-  background-color: ${({ theme }) => theme.bg};
+  background-image: ${({ theme }) => `linear-gradient(135deg, ${theme.secondary}, ${theme.bg})`};
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -43,26 +44,30 @@ const StyledButtonIcon = styled(ButtonIcon)`
   }
 `;
 
-const TopBar = () => (
-  <StyledHeader>
-    <Logo />
-    <StyledNav>
-      <StyledButtonIcon
-        as={Link}
-        to={routes.settings}
-        src={SettingsIcon}
-        data-title="settings"
-        alt="settings"
-      />
-      <StyledButtonIcon
-        as={Link}
-        to={routes.login}
-        src={LogoutIcon}
-        data-title="logout"
-        alt="logout"
-      />
-    </StyledNav>
-  </StyledHeader>
-);
+const TopBar = () => {
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+    } catch (err) {
+      throw new Error(err);
+    }
+  };
+
+  return (
+    <StyledHeader>
+      <Logo />
+      <StyledNav>
+        <StyledButtonIcon
+          as={Link}
+          to={routes.settings}
+          src={SettingsIcon}
+          data-title="settings"
+          alt="settings"
+        />
+        <StyledButtonIcon src={LogoutIcon} data-title="logout" onClick={handleLogout} />
+      </StyledNav>
+    </StyledHeader>
+  );
+};
 
 export default TopBar;
