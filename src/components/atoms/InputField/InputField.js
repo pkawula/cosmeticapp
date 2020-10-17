@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import propTypes from 'prop-types';
 
-const StyledWrapper = styled.div`
+const StyledWrapper = styled.label`
   width: 100%;
   display: block;
   position: relative;
@@ -13,18 +13,18 @@ const StyledInput = styled.input`
   width: 100%;
   font-size: ${({ theme }) => theme.fontSize.s};
   padding: 0.5em;
-  margin: 1.5em auto;
+  margin: 2em auto;
   box-shadow: 2px 2px 10px -1px hsla(0, 0%, 0%, 0.2);
   border: none;
   border-bottom: 3px solid ${({ theme }) => theme.primary};
   border-radius: 0.5em 0.5em 0 0;
-  background: transparent;
+  background: ${({ theme }) => theme.light};
 
   & ~ span {
     position: absolute;
     top: 0;
     left: 0;
-    transform: translate(0.5em, 2em);
+    transform: translate(0.5em, 0.5em);
     font-size: 1em;
     transition: transform 0.3s ease-in-out;
     opacity: 0.6;
@@ -34,7 +34,7 @@ const StyledInput = styled.input`
   &:focus ~ span,
   &:active ~ span,
   &:not([value='']) ~ span {
-    transform: translate(0em, -0.5em);
+    transform: translate(0em, -1.5em);
     text-transform: uppercase;
     font-weight: ${({ theme }) => theme.fontWeight.bold};
     opacity: 1;
@@ -52,7 +52,7 @@ const StyledInput = styled.input`
 
 const InputField = ({ type, name, placeholder, ...props }) => (
   <StyledWrapper>
-    <StyledInput type={type} {...name} {...props} />
+    <StyledInput type={type} name={name} {...props} />
     <span>{placeholder}</span>
   </StyledWrapper>
 );
