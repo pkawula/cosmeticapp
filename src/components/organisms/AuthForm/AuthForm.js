@@ -1,11 +1,12 @@
 import React, { useState, useReducer } from 'react';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import Button from 'components/atoms/Button/Button';
-import InputField from 'components/atoms/InputField/InputField';
+import { routes } from 'routes';
 import Spinner from 'components/atoms/Spinner/Spinner';
+import InputField from 'components/atoms/InputField/InputField';
+import Button from 'components/atoms/Button/Button';
 import Link from 'components/atoms/Link/Link';
-import { Link as RouterLink } from 'react-router-dom';
 import { auth } from '../../../firebase';
 
 const Form = styled.form`
@@ -39,6 +40,8 @@ const ForgetMessage = styled.p`
 const AuthForm = ({ formToDisplay }) => {
   const [isLoading, setIsLoading] = useState(false);
 
+  const history = useHistory();
+
   const [inputValues, setInputValues] = useReducer(
     (state, newState) => ({ ...state, ...newState }),
     {
@@ -63,9 +66,14 @@ const AuthForm = ({ formToDisplay }) => {
 
     try {
       await auth.signInWithEmailAndPassword(inputValues.email, inputValues.password);
+      history.push(routes.home);
     } catch (err) {
       throw new Error(err.message);
     }
+  };
+
+  const signUp = e => {
+    e.preventDefault();
   };
 
   return (
@@ -96,12 +104,12 @@ const AuthForm = ({ formToDisplay }) => {
               <Button>Submit</Button>
               <ForgetMessage>
                 Forget password?{' '}
-                <Link as={RouterLink} to="/register">
+                <Link as={RouterLink} to={routes.resetPassword}>
                   Reset password
                 </Link>
                 <br />
                 Don&apos;t have an account?{' '}
-                <Link as={RouterLink} to="/register">
+                <Link as={RouterLink} to={routes.register}>
                   Register
                 </Link>
               </ForgetMessage>
@@ -109,8 +117,8 @@ const AuthForm = ({ formToDisplay }) => {
           )}
         </>
       ) : (
-        <Form>
-          <FormTitle>Register new account</FormTitle>
+        <Form onSubmit={signUp}>
+          <FormTitle>Create new account</FormTitle>
           <InputField
             type="text"
             placeholder="Your name"
@@ -154,7 +162,7 @@ const AuthForm = ({ formToDisplay }) => {
           <Button>Submit</Button>
           <ForgetMessage>
             Already have an account?{' '}
-            <Link as={RouterLink} to="/login">
+            <Link as={RouterLink} to={routes.login}>
               Login
             </Link>
           </ForgetMessage>

@@ -1,7 +1,10 @@
+import React from 'react';
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Button from 'components/atoms/Button/Button';
 import AuthForm from 'components/organisms/AuthForm/AuthForm';
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import { routes } from 'routes';
 
 const Wrapper = styled.main`
   width: 100%;
@@ -42,33 +45,31 @@ const ButtonsWrapper = styled.div`
   margin: 5em auto 0;
 `;
 
-const LandingPage = () => {
-  const [isFormChosen, setIsFormChosen] = useState(false);
-  const [form, showForm] = useState('login');
+const LandingPage = ({ displayForm }) => (
+  <Wrapper>
+    <Heading>CosmeticApp</Heading>
+    <PromoSubtitle>Manage your cosmetic business easy with class</PromoSubtitle>
+    {displayForm ? (
+      <AuthForm formToDisplay={displayForm} />
+    ) : (
+      <ButtonsWrapper>
+        <Button as={Link} to={routes.register}>
+          Sign up
+        </Button>
+        <Button as={Link} to={routes.login} secondary>
+          Sign in
+        </Button>
+      </ButtonsWrapper>
+    )}
+  </Wrapper>
+);
 
-  const handleRegisterClick = () => {
-    setIsFormChosen(true);
-    showForm('register');
-  };
+LandingPage.propTypes = {
+  displayForm: PropTypes.string,
+};
 
-  const handleLoginClick = () => setIsFormChosen(true);
-
-  return (
-    <Wrapper>
-      <Heading>CosmeticApp</Heading>
-      <PromoSubtitle>Manage your cosmetic business easy with class</PromoSubtitle>
-      {isFormChosen ? (
-        <AuthForm formToDisplay={form} />
-      ) : (
-        <ButtonsWrapper>
-          <Button onClick={handleRegisterClick}>Sign up</Button>
-          <Button onClick={handleLoginClick} secondary>
-            Sign in
-          </Button>
-        </ButtonsWrapper>
-      )}
-    </Wrapper>
-  );
+LandingPage.defaultProps = {
+  displayForm: false,
 };
 
 export default LandingPage;

@@ -54,7 +54,17 @@ const Main = ({ logInUser, logOutUser, user }) => {
               </ClientsContextProvider>
             </>
           ) : (
-            <LandingPage />
+            <Switch>
+              <Route exact path={routes.home}>
+                <LandingPage />
+              </Route>
+              <Route path={routes.login}>
+                <LandingPage displayForm="login" />
+              </Route>
+              <Route path={routes.register}>
+                <LandingPage displayForm="register" />
+              </Route>
+            </Switch>
           )}
         </>
       )}
