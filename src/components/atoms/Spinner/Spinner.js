@@ -11,6 +11,7 @@ const SpinnerWrapper = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   animation: spin 1s ease-in-out infinite;
+  z-index: 999;
 
   svg {
     width: 4em;

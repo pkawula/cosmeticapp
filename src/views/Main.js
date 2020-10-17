@@ -1,14 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { routes } from 'routes';
 import ClientsContextProvider from 'contexts/Clients';
 import AppointmentsContextProvider from 'contexts/Appointments';
+import { LOGIN_USER, LOGOUT_USER } from 'reducers/AppReducer';
 import TopBar from 'components/organisms/TopBar/TopBar';
 import LandingPage from 'pages/Landing/Landing';
 import Panel from 'views/Panel';
-import { LOGIN_USER, LOGOUT_USER } from 'reducers/AppReducer';
+import Spinner from 'components/atoms/Spinner/Spinner';
 import { auth } from '../firebase';
 import AddClient from './AddClient';
 import AllClients from './AllClients';
@@ -18,11 +19,12 @@ import EditAppointment from './EditAppointment';
 import ManageAppointments from './ManageAppointments';
 
 const Main = ({ logInUser, logOutUser, user }) => {
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
   useEffect(() => {
     const authUser = auth.onAuthStateChanged(userData => {
-      if (userData) return logInUser(userData);
-
-      return logOutUser();
+      setIsLoadingUser(false);
+      logInUser(userData);
     });
 
     return authUser;
@@ -30,25 +32,31 @@ const Main = ({ logInUser, logOutUser, user }) => {
 
   return (
     <>
-      {user !== null ? (
-        <>
-          <TopBar />
-          <ClientsContextProvider>
-            <AppointmentsContextProvider>
-              <Switch>
-                <Route exact path={routes.home} component={Panel} />
-                <Route path={routes.addClient} component={AddClient} />
-                <Route path={routes.clients} component={AllClients} />
-                <Route path={routes.calendar} component={CalendarView} />
-                <Route exact path={routes.addAppointment} component={MakeAppointment} />
-                <Route path={routes.editAppointment} component={EditAppointment} />
-                <Route path={routes.manageAppointments} component={ManageAppointments} />
-              </Switch>
-            </AppointmentsContextProvider>
-          </ClientsContextProvider>
-        </>
+      {isLoadingUser ? (
+        <Spinner />
       ) : (
-        <LandingPage />
+        <>
+          {user !== null ? (
+            <>
+              <TopBar />
+              <ClientsContextProvider>
+                <AppointmentsContextProvider>
+                  <Switch>
+                    <Route exact path={routes.home} component={Panel} />
+                    <Route path={routes.addClient} component={AddClient} />
+                    <Route path={routes.clients} component={AllClients} />
+                    <Route path={routes.calendar} component={CalendarView} />
+                    <Route exact path={routes.addAppointment} component={MakeAppointment} />
+                    <Route path={routes.editAppointment} component={EditAppointment} />
+                    <Route path={routes.manageAppointments} component={ManageAppointments} />
+                  </Switch>
+                </AppointmentsContextProvider>
+              </ClientsContextProvider>
+            </>
+          ) : (
+            <LandingPage />
+          )}
+        </>
       )}
     </>
   );

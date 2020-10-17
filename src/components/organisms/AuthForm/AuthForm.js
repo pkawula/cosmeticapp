@@ -44,11 +44,14 @@ const AuthForm = ({ formToDisplay }) => {
     {
       email: '',
       password: '',
+      name: '',
+      company: '',
+      repeatPassword: '',
     },
   );
 
   const handleChange = e => {
-    const { type } = e.target;
+    const type = e.target.name;
     const { value } = e.target;
 
     setInputValues({ [type]: value });
@@ -109,24 +112,44 @@ const AuthForm = ({ formToDisplay }) => {
         <Form>
           <FormTitle>Register new account</FormTitle>
           <InputField
-            type="Give this field a name"
-            placeholder="Give this field a name"
-            name="Give this field a name"
+            type="text"
+            placeholder="Your name"
+            name="name"
+            value={inputValues.name}
+            onChange={handleChange}
+            autocomplete="name"
           />
           <InputField
-            type="Give this field a name"
-            placeholder="Give this field a name"
-            name="Give this field a name"
+            type="text"
+            placeholder="Company name"
+            name="company"
+            value={inputValues.company}
+            onChange={handleChange}
+            autocomplete="company"
           />
           <InputField
-            type="Give this field a name"
-            placeholder="Give this field a name"
-            name="Give this field a name"
+            type="email"
+            placeholder="Your email"
+            name="email"
+            value={inputValues.email}
+            onChange={handleChange}
+            autocomplete="email"
           />
           <InputField
-            type="Give this field a name"
-            placeholder="Give this field a name"
-            name="Give this field a name"
+            type="password"
+            placeholder="Your password"
+            name="password"
+            value={inputValues.password}
+            onChange={handleChange}
+            autocomplete="password"
+          />
+          <InputField
+            type="password"
+            placeholder="Repeat password"
+            name="repeatPassword"
+            value={inputValues.repeatPassword}
+            onChange={handleChange}
+            autocomplete="repeat-password"
           />
           <Button>Submit</Button>
           <ForgetMessage>
