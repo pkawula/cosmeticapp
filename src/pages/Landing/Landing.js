@@ -69,7 +69,7 @@ LandingPage.propTypes = {
 };
 
 LandingPage.defaultProps = {
-  displayForm: false,
+  displayForm: '',
 };
 
 export default LandingPage;
