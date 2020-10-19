@@ -1,4 +1,4 @@
-import React, { useState, useReducer , useEffect } from 'react';
+import React, { useState, useReducer, useEffect } from 'react';
 import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -9,7 +9,6 @@ import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 import Link from 'components/atoms/Link/Link';
 import { auth, db } from '../../../firebase';
-
 
 const Form = styled.form`
   display: block;
@@ -183,11 +182,6 @@ const AuthForm = ({ formToDisplay }) => {
     if (validateFields(fields)) return setIsLoading(false);
 
     try {
-      if (db.collection(inputValues.company).get()) {
-        setIsLoading(false);
-        return handleServerErrors('Company exists', 'Company with this name already exists');
-      }
-
       await auth.createUserWithEmailAndPassword(inputValues.email, inputValues.password);
       await auth.currentUser.updateProfile({
         displayName: inputValues.name,
@@ -227,17 +221,24 @@ const AuthForm = ({ formToDisplay }) => {
       };
 
       await db
-        .collection(inputValues.company)
+        .collection(auth.currentUser.uid)
         .doc('services')
         .set(defaultServices);
       await db
-        .collection(inputValues.company)
+        .collection(auth.currentUser.uid)
         .doc('clients')
         .set(defaultClients);
       await db
-        .collection(inputValues.company)
+        .collection(auth.currentUser.uid)
         .doc('appointments')
         .set({ data: [] });
+      await db
+        .collection(auth.currentUser.uid)
+        .doc('company')
+        .set({
+          id: uuid(),
+          name: inputValues.company,
+        });
 
       return history.push(routes.home);
     } catch (err) {
