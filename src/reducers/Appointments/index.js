@@ -1,11 +1,8 @@
+import { v4 as uuid } from 'uuid';
+
 export const ADD_APPOINTMENT = 'ADD_APPOINTMENT';
 export const REMOVE_APPOINTMENT = 'REMOVE_APPOINTMENT';
 export const UPDATE_APPOINTMENT = 'UPDATE_APPOINTMENT';
-
-const generateAppointmentId = () =>
-  Math.random()
-    .toString(36)
-    .substr(2, 9);
 
 export const Appointments = (state, action) => {
   switch (action.type) {
@@ -14,7 +11,7 @@ export const Appointments = (state, action) => {
         ...state,
         {
           ...action.payload,
-          ID: generateAppointmentId(),
+          ID: uuid(),
         },
       ];
     case REMOVE_APPOINTMENT:

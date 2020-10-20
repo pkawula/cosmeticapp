@@ -3,7 +3,6 @@ import propTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
-import { ClientsContext } from 'contexts/Clients';
 import { AppointmentsContext } from 'contexts/Appointments';
 import { ADD_APPOINTMENT, UPDATE_APPOINTMENT } from 'reducers/Appointments';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
@@ -15,6 +14,7 @@ import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import Modal from 'components/atoms/Modal/Modal';
 import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
+import { useFirestore } from 'utils/utils';
 
 const NOTIFICATION = {
   SUCCESS: 'success',
@@ -424,7 +424,8 @@ const AppoinmentForm = ({
   appointmentId,
 }) => {
   const { dispatch } = useContext(AppointmentsContext);
-  const { clients } = useContext(ClientsContext);
+
+  const clients = useFirestore('clients');
 
   const [notifications, setNotification] = useState([]);
 

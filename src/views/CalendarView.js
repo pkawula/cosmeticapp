@@ -4,10 +4,10 @@ import { ReactComponent as SortArrow } from 'images/icons/sort_arrow.svg';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import Event from 'components/molecules/Event/Event';
-import { ClientsContext } from 'contexts/Clients';
 import { AppointmentsContext } from 'contexts/Appointments';
 import Button from 'components/atoms/Button/Button';
 import { REMOVE_APPOINTMENT } from 'reducers/Appointments';
+import { useFirestore } from 'utils/utils';
 
 const StyledWrapper = styled.section`
   width: 100%;
@@ -107,7 +107,7 @@ const SORT_DIRECTION = {
 };
 
 const CalendarView = () => {
-  const { clients } = useContext(ClientsContext);
+  const clients = useFirestore('clients');
   const { appointments, dispatch } = useContext(AppointmentsContext);
 
   const today = new Date();
@@ -131,6 +131,8 @@ const CalendarView = () => {
     if (direction === SORT_DIRECTION.ASC) return firstDate - secondDate;
     return secondDate - firstDate;
   };
+
+  console.log(clients);
 
   const filteredAppointments = appointments
     .filter(

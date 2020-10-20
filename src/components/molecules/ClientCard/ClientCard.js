@@ -181,6 +181,8 @@ const ClientCard = ({ name, phone, email, image, clientID, deleteClient }) => {
   );
 
   const isTopCustomer = () => {
+    if (!clients.length > 0) return false;
+
     const findValueOfAppointments = id =>
       appointments.filter(appointment => appointment.clientID === id).length;
 
