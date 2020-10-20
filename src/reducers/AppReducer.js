@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { v4 as uuid } from 'uuid';
-// import { Clients as ClientsState, Appointments as AppointmentsState } from 'actions/index';
+import firebase, { db } from '../firebase';
 
 export const ADD_CLIENT = 'ADD_CLIENT';
 export const REMOVE_CLIENT = 'REMOVE_CLIENT';
@@ -13,28 +13,38 @@ export const UPDATE_APPOINTMENT = 'UPDATE_APPOINTMENT';
 export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
 
-// const initialClients = ClientsState.get();
-// const initialAppointments = AppointmentsState.get();
-
-const Clients = (state = [], action) => {
+const Clients = (_, action) => {
   switch (action.type) {
     case ADD_CLIENT:
-      return [
-        ...state,
-        {
-          ...action.payload,
-          clientID: uuid(),
-        },
-      ];
+      return db
+        .collection(action.userId)
+        .doc('clients')
+        .update({
+          data: firebase.firestore.FieldValue.arrayUnion({
+            clientID: uuid(),
+            ...action.payload,
+          }),
+        });
     case REMOVE_CLIENT:
-      return state.filter(client => client.clientID !== action.id);
+      return db
+        .collection(action.userId)
+        .doc('clients')
+        .update({
+          data: firebase.firestore.FieldValue.arrayRemove({
+            ...action.payload,
+          }),
+        });
     case UPDATE_CLIENT:
-      return [
-        ...state.filter(client => client.clientID !== action.payload.clientID),
-        action.payload,
-      ];
+      return db
+        .collection(action.userId)
+        .doc('clients')
+        .update({
+          data: firebase.firestore.FieldValue.arrayUnion({
+            ...action.payload,
+          }),
+        });
     default:
-      return state;
+      return [];
   }
 };
 
@@ -74,6 +84,10 @@ const User = (state = null, action) => {
   }
 };
 
-const AppReducer = combineReducers({ clients: Clients, appointments: Appointments, user: User });
+const AppReducer = combineReducers({
+  clients: Clients,
+  appointments: Appointments,
+  user: User,
+});
 
 export default AppReducer;
