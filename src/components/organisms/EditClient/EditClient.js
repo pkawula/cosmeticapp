@@ -1,12 +1,13 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import propTypes from 'prop-types';
 import ProfilePicture from 'images/person.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
-import { ClientsContext } from 'contexts/Clients';
-import { UPDATE_CLIENT } from 'reducers/Clients';
+import { REMOVE_CLIENT, UPDATE_CLIENT } from 'reducers/Clients';
 import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
+import { connect } from 'react-redux';
+import { auth } from '../../../firebase';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -167,8 +168,16 @@ const ErrorMessage = styled.span`
   border-radius: 0.5em;
 `;
 
-const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) => {
-  const { dispatch } = useContext(ClientsContext);
+const EditClient = ({
+  name,
+  email,
+  phone,
+  image,
+  clientID,
+  toggleModalFunc,
+  updateClient,
+  removeClient,
+}) => {
   const [client, setClient] = useState({ name, email, phone, image, clientID });
   const [error, setError] = useState('');
   const [buttonActive, setButton] = useState(true);
@@ -205,11 +214,10 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
     setClient({ ...client, [fieldName]: fieldValue });
   };
 
-  const onSave = e => {
-    e.preventDefault();
-
+  const onSave = () => {
     if (client.name && client.phone && client.email) {
-      dispatch({ type: UPDATE_CLIENT, payload: { ...client } });
+      removeClient(auth.currentUser.uid, { name, email, phone, image, clientID });
+      updateClient(auth.currentUser.uid, { ...client });
       setClient({});
       setError({ type: 'success', message: 'Client added successfully' });
       setTimeout(() => setError(''), 1000);
@@ -219,15 +227,15 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
     }
   };
 
-  const proceed = e => {
-    onSave(e);
+  const proceed = () => {
+    onSave();
     closeGlobalModal();
     toggleModalFunc();
   };
 
   return (
     <StyledWrapper animationIn={animationIn}>
-      {globalModalOpened && <GlobalModal confirm={e => proceed(e)} cancel={closeGlobalModal} />}
+      {globalModalOpened && <GlobalModal confirm={proceed} cancel={closeGlobalModal} />}
       <StyledCloseButton
         onClick={() => {
           toggleAnimationIn();
@@ -237,33 +245,13 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
       <StyledLabelContainer>
         <StyledLabel title="add/change image">
           <StyledImage src={client.image || ProfilePicture} alt="Profile picture" />
-          <StyledInputField
-            onChange={e => onImageChange(e)}
-            type="file"
-            accept="image/*"
-            name="addImage"
-          />
+          <StyledInputField onChange={onImageChange} type="file" accept="image/*" name="addImage" />
         </StyledLabel>
       </StyledLabelContainer>
       <StyledInputContainer>
-        <InputField
-          onChange={e => onUserInput(e)}
-          value={client.name}
-          placeholder="name"
-          id="name"
-        />
-        <InputField
-          onChange={e => onUserInput(e)}
-          value={client.phone}
-          placeholder="phone"
-          id="phone"
-        />
-        <InputField
-          onChange={e => onUserInput(e)}
-          value={client.email}
-          placeholder="email"
-          id="email"
-        />
+        <InputField onChange={onUserInput} value={client.name} placeholder="name" id="name" />
+        <InputField onChange={onUserInput} value={client.phone} placeholder="phone" id="phone" />
+        <InputField onChange={onUserInput} value={client.email} placeholder="email" id="email" />
       </StyledInputContainer>
       <Button
         cancel
@@ -276,7 +264,8 @@ const EditClient = ({ name, email, phone, image, clientID, toggleModalFunc }) =>
       </Button>
       <Button
         type="submit"
-        onClick={() => {
+        onClick={e => {
+          e.preventDefault();
           toggleAnimationIn();
           setTimeout(() => openGlobalModal(), 300);
         }}
@@ -298,10 +287,19 @@ EditClient.propTypes = {
   clientID: propTypes.string.isRequired,
   toggleModalFunc: propTypes.func.isRequired,
   image: propTypes.string,
+  updateClient: propTypes.func.isRequired,
+  removeClient: propTypes.func.isRequired,
 };
 
 EditClient.defaultProps = {
   image: null,
 };
 
-export default EditClient;
+const mapDispatchToProps = dispatch => ({
+  removeClient: (userId, clientData) =>
+    dispatch({ type: REMOVE_CLIENT, payload: { ...clientData }, userId }),
+  updateClient: (userId, clientData) =>
+    dispatch({ type: UPDATE_CLIENT, userId, payload: { ...clientData } }),
+});
+
+export default connect(null, mapDispatchToProps)(EditClient);

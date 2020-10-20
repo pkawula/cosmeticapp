@@ -1,14 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import propTypes from 'prop-types';
 import ProfilePicture from 'images/person.svg';
 import InputField from 'components/atoms/InputField/InputField';
 import Button from 'components/atoms/Button/Button';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { routes } from 'routes';
-import { ClientsContext } from 'contexts/Clients';
+// import { ClientsContext } from 'contexts/Clients';
 import { ADD_CLIENT } from 'reducers/Clients';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
+import { auth } from '../firebase';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -108,8 +110,8 @@ const ErrorMessage = styled.span`
   border-radius: 0.5em;
 `;
 
-const AddClient = ({ history: { goBack } }) => {
-  const { dispatch } = useContext(ClientsContext);
+const AddClient = ({ addClient, history: { goBack } }) => {
+  // const { dispatch } = useContext(ClientsContext);
   const [client, setClient] = useState('');
   const [error, setError] = useState('');
   const [buttonActive, setButton] = useState(true);
@@ -143,7 +145,7 @@ const AddClient = ({ history: { goBack } }) => {
     e.preventDefault();
 
     if (client.name && client.phone && client.email) {
-      dispatch({ type: ADD_CLIENT, payload: { ...client } });
+      addClient(auth.currentUser.uid, { ...client });
       setClient({});
       setError({ type: 'success', message: 'Client added successfully' });
       setTimeout(() => setError(''), 1000);
@@ -221,6 +223,11 @@ AddClient.propTypes = {
   history: propTypes.shape({
     goBack: propTypes.func.isRequired,
   }).isRequired,
+  addClient: propTypes.func.isRequired,
 };
 
-export default AddClient;
+const mapDispatchToProps = dispatch => ({
+  addClient: (userId, userData) => dispatch({ type: ADD_CLIENT, payload: userData, userId }),
+});
+
+export default connect(null, mapDispatchToProps)(AddClient);

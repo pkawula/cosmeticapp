@@ -15,6 +15,8 @@ import Link from 'components/atoms/Link/Link';
 import EditClient from 'components/organisms/EditClient/EditClient';
 import { AppointmentsContext } from 'contexts/Appointments';
 import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
+import { connect } from 'react-redux';
+import { auth } from '../../../firebase';
 
 const StyledWrapper = styled.section`
   display: block;
@@ -164,8 +166,8 @@ const StyledListHeading = styled.h3`
   margin: 0 0 0.5em;
 `;
 
-const ClientCard = ({ name, phone, email, image, clientID }) => {
-  const { clients, dispatch } = useContext(ClientsContext);
+const ClientCard = ({ name, phone, email, image, clientID, deleteClient }) => {
+  const { clients } = useContext(ClientsContext);
   const { appointments } = useContext(AppointmentsContext);
 
   const [modalOpened, setModal] = useState(false);
@@ -243,15 +245,19 @@ const ClientCard = ({ name, phone, email, image, clientID }) => {
     }`;
   };
 
-  const deleteClient = id => dispatch({ type: REMOVE_CLIENT, id });
-
   const toggleModal = () => {
     setModal(!modalOpened);
   };
 
   const confirmFunc = () => {
     closeGlobalModal();
-    deleteClient(clientID);
+    deleteClient(auth.currentUser.uid, {
+      name,
+      phone,
+      email,
+      image,
+      clientID,
+    });
   };
 
   return (
@@ -307,10 +313,16 @@ ClientCard.propTypes = {
   phone: propTypes.string.isRequired,
   clientID: propTypes.string.isRequired,
   image: propTypes.string,
+  deleteClient: propTypes.func.isRequired,
 };
 
 ClientCard.defaultProps = {
   image: null,
 };
 
-export default ClientCard;
+const mapDispatchToProps = dispatch => ({
+  deleteClient: (userId, clientData) =>
+    dispatch({ type: REMOVE_CLIENT, payload: { ...clientData }, userId }),
+});
+
+export default connect(null, mapDispatchToProps)(ClientCard);

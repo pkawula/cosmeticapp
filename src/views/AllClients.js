@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react';
-import ClientCard from 'components/molecules/ClientCard/ClientCard';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import { routes } from 'routes';
+import { useFirestore } from 'utils/utils';
 import { Link } from 'react-router-dom';
+import ClientCard from 'components/molecules/ClientCard/ClientCard';
+import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import Button from 'components/atoms/Button/Button';
-import { ClientsContext } from 'contexts/Clients';
 import SearchBar from 'components/molecules/SearchBar/SearchBar';
 
 const StyledWrapper = styled.div`
@@ -48,8 +48,8 @@ const TopContainer = styled.div`
 `;
 
 const AllClients = () => {
-  const { clients } = useContext(ClientsContext);
   const [searchedValue, setValue] = useState('');
+  const clients = useFirestore('clients');
 
   const searchClient = (object, phrase) => {
     const keys = ['name', 'phone', 'email'];
