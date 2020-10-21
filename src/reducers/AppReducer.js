@@ -48,22 +48,38 @@ const Clients = (_, action) => {
   }
 };
 
-const Appointments = (state = [], action) => {
+const Appointments = (_, action) => {
   switch (action.type) {
     case ADD_APPOINTMENT:
-      return [
-        ...state,
-        {
-          ...action.payload,
-          ID: uuid(),
-        },
-      ];
+      return db
+        .collection(action.userId)
+        .doc('appointments')
+        .update({
+          data: firebase.firestore.FieldValue.arrayUnion({
+            ID: uuid(),
+            ...action.payload,
+          }),
+        });
     case REMOVE_APPOINTMENT:
-      return state.filter(appointment => appointment.ID !== action.id);
+      return db
+        .collection(action.userId)
+        .doc('appointments')
+        .update({
+          data: firebase.firestore.FieldValue.arrayRemove({
+            ...action.payload,
+          }),
+        });
     case UPDATE_APPOINTMENT:
-      return [...state.filter(appointment => appointment.ID !== action.payload.ID), action.payload];
+      return db
+        .collection(action.userId)
+        .doc('appointments')
+        .update({
+          data: firebase.firestore.FieldValue.arrayUnion({
+            ...action.payload,
+          }),
+        });
     default:
-      return state;
+      return [];
   }
 };
 

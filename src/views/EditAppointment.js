@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import propTypes from 'prop-types';
 import styled from 'styled-components';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import AppointmentForm from 'components/organisms/AppointmentForm/AppoinmentForm';
-import { AppointmentsContext } from 'contexts/Appointments';
-import { ClientsContext } from 'contexts/Clients';
+import { useFirestore } from 'utils/utils';
+import Spinner from 'components/atoms/Spinner/Spinner';
 
 const Wrapper = styled.div`
   padding: 1em 0.5em 0 0.5em;
@@ -18,27 +18,29 @@ const EditAppointment = ({
     params: { id },
   },
 }) => {
-  const { appointments } = useContext(AppointmentsContext);
-  const { clients } = useContext(ClientsContext);
+  const appointments = useFirestore('appointments');
 
-  const appointmentToEdit = appointments.filter(({ ID }) => ID === id);
+  const [appointment, setAppointment] = useState({});
 
-  const { pickedServices, visitDate } = appointmentToEdit[0];
-
-  const clientId = appointmentToEdit[0].clientID;
-  const { name } = clients.filter(({ clientID }) => clientID === clientId)[0];
+  useEffect(() => {
+    setAppointment(...appointments.filter(({ ID }) => ID === id));
+  }, [appointments, id]);
 
   return (
     <Wrapper>
       <PageTitle>Edit Appointment</PageTitle>
-      <AppointmentForm
-        pickedServices={pickedServices}
-        visitDate={visitDate}
-        clientName={name}
-        clientId={clientId}
-        history={history}
-        appointmentId={id}
-      />
+      {appointment ? (
+        <AppointmentForm
+          pickedServices={appointment.pickedServices}
+          visitDate={appointment.visitDate}
+          clientId={appointment.clientID}
+          history={history}
+          appointmentId={id}
+          clientName={appointment.clientName}
+        />
+      ) : (
+        <Spinner />
+      )}
     </Wrapper>
   );
 };

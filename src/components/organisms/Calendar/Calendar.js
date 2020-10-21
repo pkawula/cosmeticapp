@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import { ReactComponent as ArrowImage } from 'images/icons/arrow.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
-
-import { AppointmentsContext } from 'contexts/Appointments';
+import { useFirestore } from 'utils/utils';
 
 const StyledWrapper = styled.div`
   display: block;
@@ -195,7 +194,7 @@ const StyledInnerWrapper = styled.ul`
 `;
 
 const Calendar = ({ optDate, changeDate, toggleModal }) => {
-  const { appointments } = useContext(AppointmentsContext);
+  const appointments = useFirestore('appointments');
 
   const getStartDayOfMonth = currentDate => {
     return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -289,9 +288,9 @@ const Calendar = ({ optDate, changeDate, toggleModal }) => {
 
     return appointments.filter(
       ({ visitDate }) =>
-        new Date(visitDate).getDate() === dayToCheck &&
-        new Date(visitDate).getMonth() === monthToCheck &&
-        new Date(visitDate).getFullYear() === yearToCheck,
+        new Date(visitDate.seconds * 1000).getDate() === dayToCheck &&
+        new Date(visitDate.seconds * 1000).getMonth() === monthToCheck &&
+        new Date(visitDate.seconds * 1000).getFullYear() === yearToCheck,
     ).length;
   };
 

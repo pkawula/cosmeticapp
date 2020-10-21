@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
-import { ClientsContext } from 'contexts/Clients';
+import { useFirestore } from 'utils/utils';
 import { REMOVE_CLIENT } from 'reducers/Clients';
 import ProfilePicture from 'images/person.svg';
 import TrashIcon from 'images/icons/delete_icon.svg';
@@ -13,7 +13,6 @@ import VisitIcon from 'images/icons/visit_icon.svg';
 import ButtonIcon from 'components/atoms/ButtonIcon/ButtonIcon';
 import Link from 'components/atoms/Link/Link';
 import EditClient from 'components/organisms/EditClient/EditClient';
-import { AppointmentsContext } from 'contexts/Appointments';
 import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
 import { connect } from 'react-redux';
 import { auth } from '../../../firebase';
@@ -167,8 +166,8 @@ const StyledListHeading = styled.h3`
 `;
 
 const ClientCard = ({ name, phone, email, image, clientID, deleteClient }) => {
-  const { clients } = useContext(ClientsContext);
-  const { appointments } = useContext(AppointmentsContext);
+  const clients = useFirestore('clients');
+  const appointments = useFirestore('appointments');
 
   const [modalOpened, setModal] = useState(false);
   const [globalModalOpened, setGlobalModal] = useState(false);
@@ -214,11 +213,11 @@ const ClientCard = ({ name, phone, email, image, clientID, deleteClient }) => {
     const convertedTime = filteredAppointments.reduce((prevVal, curVal) => {
       const prevValue =
         typeof prevVal === 'object'
-          ? new Date(prevVal.visitDate).getTime()
+          ? new Date(prevVal.visitDate.seconds * 1000).getTime()
           : new Date(prevVal).getTime();
       const curValue =
         typeof curVal === 'object'
-          ? new Date(curVal.visitDate).getTime()
+          ? new Date(curVal.visitDate.seconds * 1000).getTime()
           : new Date(curVal).getTime();
 
       return curValue > today && Math.abs(curValue - today) < Math.abs(prevValue - today)
@@ -227,7 +226,7 @@ const ClientCard = ({ name, phone, email, image, clientID, deleteClient }) => {
     });
 
     if (typeof convertedTime === 'object') {
-      const visitTime = new Date(convertedTime.visitDate);
+      const visitTime = new Date(convertedTime.visitDate.seconds * 1000);
 
       if (visitTime.getTime() < today) return 'No new planned visits';
 

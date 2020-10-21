@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
 import { ReactComponent as SortArrow } from 'images/icons/sort_arrow.svg';
+import { connect } from 'react-redux';
 import Calendar from 'components/organisms/Calendar/Calendar';
 import PageTitle from 'components/atoms/PageTitle/PageTitle';
 import Event from 'components/molecules/Event/Event';
-import { AppointmentsContext } from 'contexts/Appointments';
 import Button from 'components/atoms/Button/Button';
 import { REMOVE_APPOINTMENT } from 'reducers/Appointments';
 import { useFirestore } from 'utils/utils';
+import { auth } from '../firebase';
 
 const StyledWrapper = styled.section`
   width: 100%;
@@ -106,9 +108,9 @@ const SORT_DIRECTION = {
   DESC: 'desc',
 };
 
-const CalendarView = () => {
+const CalendarView = ({ removeAppointment }) => {
   const clients = useFirestore('clients');
-  const { appointments, dispatch } = useContext(AppointmentsContext);
+  const appointments = useFirestore('appointments');
 
   const today = new Date();
 
@@ -132,14 +134,12 @@ const CalendarView = () => {
     return secondDate - firstDate;
   };
 
-  console.log(clients);
-
   const filteredAppointments = appointments
     .filter(
       ({ visitDate }) =>
-        new Date(visitDate).getMonth() === month &&
-        new Date(visitDate).getDate() === day &&
-        new Date(visitDate).getFullYear() === year,
+        new Date(visitDate.seconds * 1000).getMonth() === month &&
+        new Date(visitDate.seconds * 1000).getDate() === day &&
+        new Date(visitDate.seconds * 1000).getFullYear() === year,
     )
     .sort((firstItem, secondItem) => sortAppointments(firstItem, secondItem, sortDirection));
 
@@ -177,8 +177,8 @@ const CalendarView = () => {
     'December',
   ];
 
-  const deleteVisit = id => {
-    dispatch({ type: REMOVE_APPOINTMENT, id });
+  const deleteVisit = data => {
+    removeAppointment(auth.currentUser.uid, { ...data });
   };
 
   return (
@@ -204,18 +204,24 @@ const CalendarView = () => {
       </SectionContainer>
       {filteredAppointments.length ? (
         <StyledEventsWrapper>
-          {filteredAppointments.map(({ pickedServices, clientID: client, visitDate, ID }) => (
-            <Event
-              key={ID}
-              visitID={ID}
-              deleteVisit={deleteVisit}
-              time={`${new Date(visitDate).getHours()}:${
-                new Date(visitDate).getMinutes() === 0 ? '00' : new Date(visitDate).getMinutes()
-              }`}
-              fullName={clients.find(({ clientID }) => clientID === client).name}
-              services={pickedServices}
-            />
-          ))}
+          {filteredAppointments.map(({ pickedServices, clientID: client, visitDate, ID }) => {
+            if (!clients) return console.log('no clients');
+
+            const time = new Date(visitDate.seconds * 1000);
+
+            const currentClient = clients.find(({ clientID }) => clientID === client);
+
+            return (
+              <Event
+                key={ID}
+                visitID={ID}
+                deleteVisit={() => deleteVisit({ pickedServices, clientID: client, visitDate, ID })}
+                time={`${time.getHours()}:${time.getMinutes() === 0 ? '00' : time.getMinutes()}`}
+                fullName={clients.length > 0 ? currentClient.name : ''}
+                services={pickedServices}
+              />
+            );
+          })}
         </StyledEventsWrapper>
       ) : (
         <StyledNoEventInfo>nothing planned.. get some rest :) </StyledNoEventInfo>
@@ -224,4 +230,13 @@ const CalendarView = () => {
   );
 };
 
-export default CalendarView;
+CalendarView.propTypes = {
+  removeAppointment: PropTypes.func.isRequired,
+};
+
+const mapDispatchToProps = dispatch => ({
+  removeAppointment: (userId, data) =>
+    dispatch({ type: REMOVE_APPOINTMENT, userId, payload: { ...data } }),
+});
+
+export default connect(null, mapDispatchToProps)(CalendarView);

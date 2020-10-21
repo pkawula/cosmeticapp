@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import propTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { routes } from 'routes';
-import { AppointmentsContext } from 'contexts/Appointments';
-import { ADD_APPOINTMENT, UPDATE_APPOINTMENT } from 'reducers/Appointments';
+import { ADD_APPOINTMENT, UPDATE_APPOINTMENT, REMOVE_APPOINTMENT } from 'reducers/AppReducer';
 import { ReactComponent as MagnifierIcon } from 'images/icons/search.svg';
 import { ReactComponent as PersonIcon } from 'images/person.svg';
 import DeleteIcon from 'images/icons/delete_icon.svg';
@@ -15,6 +15,7 @@ import Calendar from 'components/organisms/Calendar/Calendar';
 import Modal from 'components/atoms/Modal/Modal';
 import GlobalModal from 'components/atoms/GlobalModal/GlobalModal';
 import { useFirestore } from 'utils/utils';
+import { auth } from '../../../firebase';
 
 const NOTIFICATION = {
   SUCCESS: 'success',
@@ -419,12 +420,13 @@ const AppoinmentForm = ({
   history: { goBack },
   pickedServices: pickedServicesToEdit,
   visitDate: dateToEdit,
-  clientName,
   clientId: editClientId,
   appointmentId,
+  removeAppointment,
+  addAppointment,
+  updateAppointment,
+  clientName,
 }) => {
-  const { dispatch } = useContext(AppointmentsContext);
-
   const clients = useFirestore('clients');
 
   const [notifications, setNotification] = useState([]);
@@ -441,7 +443,9 @@ const AppoinmentForm = ({
   const [isEditing, setEdit] = useState(false);
 
   const today = new Date();
-  const [date, setDate] = useState(new Date(dateToEdit));
+  const [date, setDate] = useState(
+    dateToEdit.seconds ? new Date(dateToEdit.seconds * 1000) : dateToEdit,
+  );
   const [hours, setHours] = useState(today.getHours());
   const [minutes, setMinutes] = useState(today.getMinutes());
   const [weekDay, setWeekDay] = useState(today.getDay());
@@ -563,6 +567,7 @@ const AppoinmentForm = ({
         type: NOTIFICATION.FAIL,
         message: 'What you want to do with your client, huh??',
       });
+    // eslint-disable-next-line react/prop-types
     if (visitDate.getTime() < today.getTime())
       errors.push({
         type: NOTIFICATION.FAIL,
@@ -580,15 +585,22 @@ const AppoinmentForm = ({
         { type: NOTIFICATION.SUCCESS, message: 'Appointment updated successfully!' },
       ]);
 
-      return dispatch({
-        type: UPDATE_APPOINTMENT,
-        payload: {
-          pickedServices,
-          clientID,
-          visitDate,
-          status,
-          ID: appointmentId,
-        },
+      removeAppointment(auth.currentUser.uid, {
+        pickedServices: pickedServicesToEdit,
+        visitDate: dateToEdit,
+        clientID: editClientId,
+        ID: appointmentId,
+        status,
+        clientName,
+      });
+
+      return updateAppointment(auth.currentUser.uid, {
+        pickedServices,
+        clientID,
+        visitDate,
+        status,
+        ID: appointmentId,
+        clientName,
       });
     }
 
@@ -597,14 +609,12 @@ const AppoinmentForm = ({
 
     clearForm();
 
-    return dispatch({
-      type: ADD_APPOINTMENT,
-      payload: {
-        pickedServices,
-        clientID,
-        visitDate,
-        status,
-      },
+    return addAppointment(auth.currentUser.uid, {
+      pickedServices,
+      clientID,
+      visitDate,
+      status,
+      clientName: inputValue,
     });
   };
 
@@ -700,24 +710,28 @@ const AppoinmentForm = ({
             onBlur={() => setFocus(false)}
           />
           <StyledMagnifierIcon />
-          <SearchResults isEmpty={focused}>
-            {clients &&
-              clients
-                .filter(client => handleSearch(client, inputValue))
-                .map(({ name, image, clientID }) => (
-                  <Result
-                    key={clientID}
-                    onClick={() => {
-                      setInputValue(name);
-                      setFocus(false);
-                      setClientId(clientID);
-                    }}
-                  >
-                    {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
-                    <PersonName>{name}</PersonName>
-                  </Result>
-                ))}
-          </SearchResults>
+          {!editClientId && (
+            <SearchResults isEmpty={focused}>
+              {clients.length > 0 &&
+                clients
+                  .filter(client => handleSearch(client, inputValue))
+                  .map(({ name, image, clientID }) => (
+                    <>
+                      <Result
+                        key={clientID}
+                        onClick={() => {
+                          setInputValue(name);
+                          setFocus(false);
+                          setClientId(clientID);
+                        }}
+                      >
+                        {image ? <StyledPersonImage src={image} /> : <StyledPersonIcon />}
+                        <PersonName>{name}</PersonName>
+                      </Result>
+                    </>
+                  ))}
+            </SearchResults>
+          )}
         </SearchWrapper>
       </Section>
       {inputValue.length === 0 && (
@@ -822,18 +836,30 @@ AppoinmentForm.propTypes = {
     length: propTypes.number.isRequired,
   }).isRequired,
   pickedServices: propTypes.arrayOf(propTypes.object),
-  visitDate: propTypes.objectOf(propTypes.object),
-  clientName: propTypes.string,
+  visitDate: propTypes.shape({ seconds: propTypes.number }),
   clientId: propTypes.string,
   appointmentId: propTypes.string,
+  addAppointment: propTypes.func.isRequired,
+  updateAppointment: propTypes.func.isRequired,
+  removeAppointment: propTypes.func.isRequired,
+  clientName: propTypes.string,
 };
 
 AppoinmentForm.defaultProps = {
   pickedServices: [],
   visitDate: new Date(),
-  clientName: '',
   clientId: '',
   appointmentId: '',
+  clientName: '',
 };
 
-export default AppoinmentForm;
+const mapDispatchToProps = dispatch => ({
+  addAppointment: (userId, data) =>
+    dispatch({ type: ADD_APPOINTMENT, userId, payload: { ...data } }),
+  removeAppointment: (userId, data) =>
+    dispatch({ type: REMOVE_APPOINTMENT, userId, payload: { ...data } }),
+  updateAppointment: (userId, data) =>
+    dispatch({ type: UPDATE_APPOINTMENT, userId, payload: { ...data } }),
+});
+
+export default connect(null, mapDispatchToProps)(AppoinmentForm);
